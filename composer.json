@@ -1,7 +1,7 @@
 {
     "name": "tencentcloudbase/tcb-manager-php",
     "description": "tencentcloudbase management side sdk for php",
-    "keywords": ["TCB", "TcbManager"],
+    "keywords": ["tencentcloud", "tencentcloudbase", "TCB", "TcbManager"],
     "homepage": "https://cloud.tencent.com/product/tcb",
     "type": "library",
     "license": "Apache-2.0",
@@ -15,12 +15,13 @@
         "issues": "https://github.com/TencentCloudBase/tcb-manager-php/issues"
     },
     "scripts": {
-        "test": " phpunit -v --configuration tests/phpunit.xml tests"
+        "test": "phpunit -v --configuration tests/phpunit.xml tests",
+        "release": "sh release.sh"
     },
     "require": {
         "php": ">=7.0.0",
         "ext-json": "*",
-        "tencentcloudbase/tencentcloud-client-php": "dev-dev",
+        "tencentcloudbase/tencentcloud-client-php": "^1.0",
         "myclabs/php-enum": "^1.7",
         "nelexa/zip": "^3.1"
     },

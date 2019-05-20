@@ -45,6 +45,8 @@ class Api
         string $region = "",
         $profile = null
     ) {
+        TCClient::setVersion(Version::VERSION);
+
         $this->endpoint = $endpoint;
         $this->credential = new Credential($secretId, $secretKey);
 

@@ -85,7 +85,6 @@ class FunctionManager extends AbstractService
                 "Runtime" => $runtime,
                 "MemorySize" => 256,
                 "Timeout" => 3,
-                // "Environment" => [],
                 "FunctionName" => $functionName,
                 "Code" => ["ZipFile" => $zipFileData],
                 "Handler" => $handler,

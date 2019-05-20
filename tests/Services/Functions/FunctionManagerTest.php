@@ -24,6 +24,8 @@ class FunctionManagerTest extends TestCase
     private $sourceBeforeFilePath = __DIR__.DS."source".DS."before".DS."index.js";
     private $sourceAfterFilePath = __DIR__.DS."source".DS."after".DS;
 
+    private $sourceFilePathForPHP = __DIR__.DS."source".DS."hello-tcb-php".DS;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,10 +49,12 @@ class FunctionManagerTest extends TestCase
     public function testFunctionCompleteLifeCycleCanBeSuccess()
     {
         $defaultConfiguration = [
-            // "Description" => "123",
-            // "Environment" => [
-            //     ["Key" => "", "Value" => ""]
-            // ]
+             "Description" => "this is function description",
+             "Environment" => [
+                 "Variables" => [
+                     ["Key" => "Key", "Value" => "Value"]
+                 ]
+             ]
         ];
         // 创建函数
         $result = $this->funcManager->createFunction(
@@ -67,7 +71,7 @@ class FunctionManagerTest extends TestCase
         $this->assertHasRequestId($result);
         $this->assertEquals($result->FunctionName, $this->tmpFunctionName);
         $this->assertEquals($result->Namespace, $this->funcManager->getNamespace());
-        $this->assertEquals($result->Description, "");
+        $this->assertEquals($result->Description, $defaultConfiguration["Description"]);
         $this->assertEquals($result->Status, "Active");
         $this->assertEquals($result->Runtime, "Nodejs8.9");
         $this->assertEquals($result->InstallDependency, "TRUE");
@@ -78,8 +82,8 @@ class FunctionManagerTest extends TestCase
         // 调用云函数：第一次的上传的函数
         $jsonString = "{\"userInfo\":{\"appId\":\"\",\"openId\":\"oaoLb4qz0R8STBj6ipGlHkfNCO2Q\"}}";
         $result = $this->funcManager->invoke($this->tmpFunctionName, [
+            // "Qualifier" => "\$LATEST",
             "InvocationType" => "RequestResponse",
-            "Qualifier" => "\$LATEST",
             "ClientContext" => $jsonString,
             "LogType" => "Tail"
         ]);
@@ -93,15 +97,19 @@ class FunctionManagerTest extends TestCase
         $result = $this->funcManager->updateFunctionCode(
             $this->tmpFunctionName,
             $this->sourceAfterFilePath,
-            "index.main",
-            []
+            "index.main"
         );
         $this->assertHasRequestId($result);
 
         // 更新函数配置
         $newConfiguration = [
-            "Description" => "this is new description.",
-            "Timeout" => 10
+            "Description" => "this is new function description.",
+            "Timeout" => 10,
+            "Environment" => [
+                "Variables" => [
+                    ["Key" => "Key", "Value" => "NewValue"]
+                ]
+            ]
         ];
         $result = $this->funcManager->updateFunctionConfiguration(
             $this->tmpFunctionName,
@@ -113,7 +121,7 @@ class FunctionManagerTest extends TestCase
         $result = $this->funcManager->getFunction($this->tmpFunctionName);
         $this->assertHasRequestId($result);
         $this->assertEquals($result->FunctionName, $this->tmpFunctionName);
-        $this->assertEquals($result->Namespace, $this->scf->getNamespace());
+        $this->assertEquals($result->Namespace, $this->funcManager->getNamespace());
         $this->assertEquals($result->Description, $newConfiguration["Description"]);
         $this->assertEquals($result->Status, "Active");
         $this->assertEquals($result->Runtime, "Nodejs8.9");
@@ -137,14 +145,7 @@ class FunctionManagerTest extends TestCase
 
         $result = $this->funcManager->getFunctionLogs($this->tmpFunctionName, [
             "Offset" => 0,
-            "Limit" => 3,
-            "Qualifier" => "\$LATEST",
-//            "Filter" => [
-//                "RetCode" => "is0",
-////                "RetCode" => "not0",
-//            ],
-//            "StartTime" => date("Y-m-d H:i:s", strtotime("-24 hours")),
-//            "EndTime" => date("Y-m-d H:i:s"),
+            "Limit" => 3
         ]);
         $this->assertHasRequestId($result);
 //        var_dump($result);
@@ -156,6 +157,32 @@ class FunctionManagerTest extends TestCase
 
         // 删除函数
         $result = $this->funcManager->deleteFunction($this->tmpFunctionName);
+        $this->assertObjectHasAttribute("RequestId", $result);
+    }
+
+    public function testCreatePHPFunctionCanBeSuccess()
+    {
+        $phpFunctionName = "hello_tcb_php";
+        $defaultConfiguration = [
+            "Description" => "this is function description",
+            "Environment" => [
+                "Variables" => [
+                    ["Key" => "Key", "Value" => "Value"]
+                ]
+            ]
+        ];
+        // 创建函数
+        $result = $this->funcManager->createFunction(
+            $phpFunctionName,
+            $this->sourceFilePathForPHP,
+            "index.main_handler",
+            "Php7",
+            $defaultConfiguration
+        );
+        $this->assertHasRequestId($result);
+
+        // 删除函数
+        $result = $this->funcManager->deleteFunction($phpFunctionName);
         $this->assertObjectHasAttribute("RequestId", $result);
     }
 }

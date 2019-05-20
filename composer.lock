@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "11d481d3f9824f80ea8181881906cf0a",
+    "content-hash": "81312b8f4f8e8ad17281f976b93e448e",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -385,16 +385,16 @@
         },
         {
             "name": "tencentcloudbase/tencentcloud-client-php",
-            "version": "dev-dev",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TencentCloudBase/tencentcloud-client-php.git",
-                "reference": "6340dbdaa1a17cd9b0af97eacbab0284f78c349e"
+                "reference": "be61db9279ee5a0d8a31442e0cbd3a4f1f08f67b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TencentCloudBase/tencentcloud-client-php/zipball/6340dbdaa1a17cd9b0af97eacbab0284f78c349e",
-                "reference": "6340dbdaa1a17cd9b0af97eacbab0284f78c349e",
+                "url": "https://api.github.com/repos/TencentCloudBase/tencentcloud-client-php/zipball/be61db9279ee5a0d8a31442e0cbd3a4f1f08f67b",
+                "reference": "be61db9279ee5a0d8a31442e0cbd3a4f1f08f67b",
                 "shasum": ""
             },
             "require": {
@@ -412,30 +412,24 @@
                     "TencentCloudClient\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "TencentCloudClient\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit -v --colors=auto --configuration tests/phpunit.xml tests"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
             ],
             "authors": [
                 {
-                    "name": "ulyssesliu",
-                    "email": "ulyssesliu@tencent.com"
+                    "name": "liuyanjie",
+                    "email": "lyj8888888888@gmail.com"
                 }
             ],
-            "support": {
-                "source": "https://github.com/TencentCloudBase/tencentcloud-client-php/tree/dev",
-                "issues": "https://github.com/TencentCloudBase/tencentcloud-client-php/issues"
-            },
-            "time": "2019-05-20T04:56:08+00:00"
+            "description": "tencentcloud client sdk for php",
+            "homepage": "https://cloud.tencent.com",
+            "keywords": [
+                "TCB",
+                "tencentcloud",
+                "tencentcloudbase"
+            ],
+            "time": "2019-05-20T13:38:35+00:00"
         }
     ],
     "packages-dev": [
@@ -1915,10 +1909,8 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "tencentcloudbase/tencentcloud-client-php": 20
-    },
-    "prefer-stable": false,
+    "stability-flags": [],
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.0.0",
