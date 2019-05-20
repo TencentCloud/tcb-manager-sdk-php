@@ -1,0 +1,15 @@
+{
+    "name": "tencentcloudbase/tcb-manager-php-samples",
+    "authors": [
+        {
+            "name": "liuyanjie",
+            "email": "lyj8888888888@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "tencentcloudbase/tcb-manager-php": "dev-master"
+    },
+    "require-dev": {
+    }
+}
