@@ -3,7 +3,9 @@
 namespace TcbManager\Tests\Services\Functions;
 
 use PHPUnit\Framework\TestCase;
+use TcbManager\Constants;
 use TcbManager\Services\Functions\FunctionManager;
+use TcbManager\TcbManager;
 use TcbManager\Tests\TestBase;
 use TcbManager\Utils;
 
@@ -25,6 +27,7 @@ class FunctionManagerTest extends TestCase
     private $sourceAfterFilePath = __DIR__.DS."source".DS."after".DS;
 
     private $sourceFilePathForPHP = __DIR__.DS."source".DS."hello-tcb-php".DS;
+    private $sourceFilePathForPHPZipFile = __DIR__.DS."source".DS."hello-tcb-php.zip";
 
     protected function setUp(): void
     {
@@ -59,7 +62,9 @@ class FunctionManagerTest extends TestCase
         // 创建函数
         $result = $this->funcManager->createFunction(
             $this->tmpFunctionName,
-            $this->sourceBeforeFilePath,
+            [
+                "SourceFilePath" => $this->sourceBeforeFilePath
+            ],
             "index.main",
             "Nodejs8.9",
             $defaultConfiguration
@@ -96,7 +101,9 @@ class FunctionManagerTest extends TestCase
         // 更新函数代码
         $result = $this->funcManager->updateFunctionCode(
             $this->tmpFunctionName,
-            $this->sourceAfterFilePath,
+            [
+                "SourceFilePath" => $this->sourceAfterFilePath
+            ],
             "index.main"
         );
         $this->assertHasRequestId($result);
@@ -137,26 +144,83 @@ class FunctionManagerTest extends TestCase
             "ClientContext" => "{}",
             "LogType" => "Tail"
         ]);
+
         $this->assertHasRequestId($result);
         $this->assertObjectHasAttribute("Result", $result);
         $this->assertObjectHasAttribute("FunctionRequestId", $result->Result);
         $this->assertEquals("", $result->Result->ErrMsg);
-        $this->assertEquals("{\"a\":1,\"b\":2,\"c\":3}", $result->Result->RetMsg);
+        // $this->assertEquals("{\"a\":1,\"b\":2,\"c\":3}", $result->Result->RetMsg);
 
-        $result = $this->funcManager->getFunctionLogs($this->tmpFunctionName, [
+        $retMsg = Utils::fromJSONString($result->Result->RetMsg);
+
+        // 获取临时凭证比较麻烦，在这里测试临时凭证
+        putenv(Constants::ENV_RUNENV_SCF);
+        putenv(Constants::ENV_SECRETID."=".$retMsg->env->TENCENTCLOUD_SECRETID);
+        putenv(Constants::ENV_SECRETKEY."=".$retMsg->env->TENCENTCLOUD_SECRETKEY);
+        putenv(Constants::ENV_SESSIONTOKEN."=".$retMsg->env->TENCENTCLOUD_SESSIONTOKEN);
+        $tcb = new TcbManager([
+            // "secretId" => $retMsg->env->TENCENTCLOUD_SECRETID,
+            // "secretKey" => $retMsg->env->TENCENTCLOUD_SECRETKEY,
+            // "secretToken" => $retMsg->env->TENCENTCLOUD_SESSIONTOKEN,
+            "envId" => TestBase::$envId
+        ]);
+
+        $result = $tcb->getFunctionManager()->getFunctionLogs($this->tmpFunctionName, [
             "Offset" => 0,
             "Limit" => 3
         ]);
         $this->assertHasRequestId($result);
-//        var_dump($result);
 
         // 获取函数列表
-        $result = $this->funcManager->listFunctions();
+        $result = $tcb->getFunctionManager()->listFunctions();
         $this->assertHasRequestId($result);
         $this->assertGreaterThan(1, $result->TotalCount);
 
         // 删除函数
-        $result = $this->funcManager->deleteFunction($this->tmpFunctionName);
+        $result = $tcb->getFunctionManager()->deleteFunction($this->tmpFunctionName);
+        $this->assertObjectHasAttribute("RequestId", $result);
+    }
+
+    public function testCreateFunctionByZipFile() {
+        $code = [
+            "SourceFilePath" => $this->sourceFilePathForPHP
+        ];
+
+        $functionName = "function_create_by_zip_file";
+        $result = $this->funcManager->createFunction(
+            $functionName,
+            [
+                "ZipFile" => FunctionManager::makeZipFile($code)
+            ],
+            "index.main_handler",
+            "Php7"
+        );
+        $this->assertHasRequestId($result);
+
+        $result = $this->funcManager->deleteFunction($functionName);
+        $this->assertObjectHasAttribute("RequestId", $result);
+    }
+
+    public function testCreateFunctionByZipFilePath() {
+        if (!file_exists($this->sourceFilePathForPHPZipFile)) {
+            Utils::makeZipFile(
+                $this->sourceFilePathForPHP,
+                $this->sourceFilePathForPHPZipFile
+            );
+        }
+
+        $functionName = "function_create_by_zip_file_path";
+        $result = $this->funcManager->createFunction(
+            $functionName,
+            [
+                "ZipFilePath" => $this->sourceFilePathForPHPZipFile
+            ],
+            "index.main_handler",
+            "Php7"
+        );
+        $this->assertHasRequestId($result);
+
+        $result = $this->funcManager->deleteFunction($functionName);
         $this->assertObjectHasAttribute("RequestId", $result);
     }
 
@@ -171,17 +235,18 @@ class FunctionManagerTest extends TestCase
                 ]
             ]
         ];
-        // 创建函数
+
         $result = $this->funcManager->createFunction(
             $phpFunctionName,
-            $this->sourceFilePathForPHP,
+            [
+                "SourceFilePath" => $this->sourceFilePathForPHP
+            ],
             "index.main_handler",
             "Php7",
             $defaultConfiguration
         );
         $this->assertHasRequestId($result);
 
-        // 删除函数
         $result = $this->funcManager->deleteFunction($phpFunctionName);
         $this->assertObjectHasAttribute("RequestId", $result);
     }

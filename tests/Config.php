@@ -3,8 +3,9 @@
 namespace TcbManager\Tests;
 
 class Config {
-    public static $secretId = "";
-    public static $secretKey = "";
+    public static $secretId = "AKIDORiMgDgJrLPjxvKDm9F77NGixduHpm0o";
+    public static $secretKey = "JcFUANtb3cLtlbMuwZN9y6MIyMVXBPDG";
+    public static $secretToken = "";
 
-    public static $envId = "";
+    public static $envId = "demo-619e0a";
 }

@@ -4,6 +4,7 @@
 namespace TcbManager;
 
 
+use Exception;
 use PhpZip\Exception\ZipException;
 use PhpZip\ZipFile;
 
@@ -25,7 +26,7 @@ class Utils
 
     public static function fromJSONString($jsonString)
     {
-        return json_decode($jsonString, true);
+        return json_decode($jsonString, false);
     }
 
     public static function toJSONString($object)
@@ -53,9 +54,39 @@ class Utils
 
     /**
      * @param $sourceFilePath
+     * @param $targetZipFilePath
+     * @return string
+     * @throws Exception
+     */
+    public static function makeZipFile(string $sourceFilePath, string $targetZipFilePath)
+    {
+        if (file_exists($targetZipFilePath)) {
+            throw new Exception("Target file already exists!");
+        }
+
+        $zipFile = new ZipFile();
+
+        try {
+            if (is_dir($sourceFilePath)) {
+                $zipFile->addDirRecursive($sourceFilePath);
+            }
+            else if (is_file($sourceFilePath)) {
+                $zipFile->addFile($sourceFilePath);
+            }
+            $zipFile->saveAsFile($targetZipFilePath);
+        }
+        catch (ZipException $e) {
+        }
+        finally{
+            $zipFile->close();
+        }
+    }
+
+    /**
+     * @param $sourceFilePath
      * @return string
      */
-    public static function makeZipCodeBySourceFile($sourceFilePath)
+    public static function makeZipCodeBySourceFile(string $sourceFilePath)
     {
         $zipFile = new ZipFile();
 
@@ -66,7 +97,26 @@ class Utils
             else if (is_file($sourceFilePath)) {
                 $zipFile->addFile($sourceFilePath);
             }
+            $rawZipArchiveBytes = $zipFile->outputAsString();
+            return base64_encode($rawZipArchiveBytes);
+        }
+        catch (ZipException $e) {
+        }
+        finally{
+            $zipFile->close();
+        }
+    }
 
+    /**
+     * @param $zipFilePath
+     * @return string
+     */
+    public static function makeZipCodeFromZipFile(string $zipFilePath)
+    {
+        $zipFile = new ZipFile();
+
+        try {
+            $zipFile->openFile($zipFilePath);
             $rawZipArchiveBytes = $zipFile->outputAsString();
             return base64_encode($rawZipArchiveBytes);
         }
