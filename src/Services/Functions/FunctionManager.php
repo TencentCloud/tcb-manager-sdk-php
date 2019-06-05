@@ -7,7 +7,6 @@ use Exception;
 use stdClass;
 
 use TcbManager\Api\Endpoint;
-use TcbManager\Exceptions\TcbException;
 use TcbManager\Services\AbstractService;
 use TcbManager\TcbManager;
 use TcbManager\Utils;
@@ -55,10 +54,14 @@ class FunctionManager extends AbstractService
     /**
      * @param array &$code
      * @return string
+     * @throws Exception
      */
     static function makeZipFile(array &$code): string {
         $zipFile = "";
         if (array_key_exists("ZipFile", $code)) {
+            if (!is_string($code["ZipFile"])) {
+                throw new Exception("Argument ZipFile must be a string");
+            }
             $zipFile = $code["ZipFile"];
         } else if (array_key_exists("ZipFilePath", $code)) {
             $zipFile = Utils::makeZipCodeFromZipFile($code["ZipFilePath"]);

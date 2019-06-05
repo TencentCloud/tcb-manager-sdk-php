@@ -3,8 +3,8 @@
 namespace TcbManager\Api;
 
 
-use Exception;
 use TcbManager\Version;
+use TencentCloudClient\Exception\TCException;
 use TencentCloudClient\TCClient;
 use TencentCloudClient\Credential;
 use TencentCloudClient\Http\HttpClientProfile;
@@ -56,11 +56,16 @@ class Api
         );
     }
 
+    public function getCredential()
+    {
+        return $this->credential;
+    }
+
     /**
      * @param string $action
      * @param array  $params
      * @return mixed
-     * @throws Exception
+     * @throws TCException
      */
     public function request(string $action, array $params)
     {

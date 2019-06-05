@@ -7,8 +7,10 @@ use TcbManager\Exceptions\EnvException;
 use TcbManager\Api\Api;
 use TcbManager\Api\Endpoint;
 use TcbManager\Exceptions\TcbException;
+use TcbManager\Services\Database\DatabaseManager;
 use TcbManager\Services\Functions\FunctionManager;
 use TencentCloudClient\Credential;
+use TcbManager\Services\Storage\StorageManager;
 
 /**
  * Class TcbManager
@@ -71,7 +73,10 @@ class TcbManager
 
     /**
      * TcbManager constructor.
+     *
      * @param array $options
+     *
+     * @throws EnvException
      * @throws TcbException
      */
     public function __construct(array $options)
@@ -152,5 +157,25 @@ class TcbManager
     public function getFunctionManager(string $namespace = ""): FunctionManager
     {
         return $this->currentEnvironment()->getFunctionManager($namespace);
+    }
+
+    /**
+     * @param string $bucket
+     * @return StorageManager
+     * @throws EnvException
+     */
+    public function getStorageManager(string $bucket = ""): StorageManager
+    {
+        return $this->currentEnvironment()->getStorageManager($bucket);
+    }
+
+    /**
+     * @param string $instanceId
+     * @return DatabaseManager
+     * @throws EnvException
+     */
+    public function getDatabaseManager(string $instanceId = ""): DatabaseManager
+    {
+        return $this->currentEnvironment()->getDatabaseManager($instanceId);
     }
 }

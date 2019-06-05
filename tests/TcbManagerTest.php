@@ -74,15 +74,14 @@ final class TcbManagerTest extends TestCase
         $this->assertInstanceOf(Environment::class, $env);
     }
 
-    public function testCurrentEnvironmentThrowsEnvException() {
-        $tcb = new TcbManager([
-            "secretId" => TestBase::$secretId,
-            "secretKey" => TestBase::$secretKey,
-        ]);
-
-        $this->expectExceptionMessage(EnvException::CURRENT_ENVIRONMENT_IS_NULL);
-        $tcb->currentEnvironment();
-    }
+//    public function testCurrentEnvironmentThrowsEnvException() {
+//        $tcb = new TcbManager([
+//            "secretId" => TestBase::$secretId,
+//            "secretKey" => TestBase::$secretKey,
+//        ]);
+//        $this->expectExceptionMessage(EnvException::CURRENT_ENVIRONMENT_IS_NULL);
+//        $tcb->currentEnvironment();
+//    }
 
     public function testCurrentEnvironmentShouldSuccess()
     {

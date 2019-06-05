@@ -36,7 +36,6 @@ class FunctionManagerTest extends TestCase
         TestBase::init();
 
         $this->funcManager = TestBase::$tcb->getFunctionManager();
-        $this->tmpFunctionName = "unit_test_".Utils::generateRandomString(6);
     }
 
     protected function tearDown(): void
@@ -51,6 +50,9 @@ class FunctionManagerTest extends TestCase
 
     public function testFunctionCompleteLifeCycleCanBeSuccess()
     {
+
+        $tmpFunctionName = "unit_test_".Utils::generateRandomString(6);
+
         $defaultConfiguration = [
              "Description" => "this is function description",
              "Environment" => [
@@ -61,7 +63,7 @@ class FunctionManagerTest extends TestCase
         ];
         // 创建函数
         $result = $this->funcManager->createFunction(
-            $this->tmpFunctionName,
+            $tmpFunctionName,
             [
                 "SourceFilePath" => $this->sourceBeforeFilePath
             ],
@@ -72,9 +74,9 @@ class FunctionManagerTest extends TestCase
         $this->assertHasRequestId($result);
 
         // 获取函数信息：验证函数信息
-        $result = $this->funcManager->getFunction($this->tmpFunctionName);
+        $result = $this->funcManager->getFunction($tmpFunctionName);
         $this->assertHasRequestId($result);
-        $this->assertEquals($result->FunctionName, $this->tmpFunctionName);
+        $this->assertEquals($result->FunctionName, $tmpFunctionName);
         $this->assertEquals($result->Namespace, $this->funcManager->getNamespace());
         $this->assertEquals($result->Description, $defaultConfiguration["Description"]);
         $this->assertEquals($result->Status, "Active");
@@ -86,7 +88,7 @@ class FunctionManagerTest extends TestCase
 
         // 调用云函数：第一次的上传的函数
         $jsonString = "{\"userInfo\":{\"appId\":\"\",\"openId\":\"oaoLb4qz0R8STBj6ipGlHkfNCO2Q\"}}";
-        $result = $this->funcManager->invoke($this->tmpFunctionName, [
+        $result = $this->funcManager->invoke($tmpFunctionName, [
             // "Qualifier" => "\$LATEST",
             "InvocationType" => "RequestResponse",
             "ClientContext" => $jsonString,
@@ -100,7 +102,7 @@ class FunctionManagerTest extends TestCase
 
         // 更新函数代码
         $result = $this->funcManager->updateFunctionCode(
-            $this->tmpFunctionName,
+            $tmpFunctionName,
             [
                 "SourceFilePath" => $this->sourceAfterFilePath
             ],
@@ -119,15 +121,15 @@ class FunctionManagerTest extends TestCase
             ]
         ];
         $result = $this->funcManager->updateFunctionConfiguration(
-            $this->tmpFunctionName,
+            $tmpFunctionName,
             $newConfiguration
         );
         $this->assertHasRequestId($result);
 
         // 获取函数信息：验证函数信息
-        $result = $this->funcManager->getFunction($this->tmpFunctionName);
+        $result = $this->funcManager->getFunction($tmpFunctionName);
         $this->assertHasRequestId($result);
-        $this->assertEquals($result->FunctionName, $this->tmpFunctionName);
+        $this->assertEquals($result->FunctionName, $tmpFunctionName);
         $this->assertEquals($result->Namespace, $this->funcManager->getNamespace());
         $this->assertEquals($result->Description, $newConfiguration["Description"]);
         $this->assertEquals($result->Status, "Active");
@@ -138,7 +140,7 @@ class FunctionManagerTest extends TestCase
         $this->assertEquals($result->Timeout, $newConfiguration["Timeout"]);
 
         // 调用云函数：第一次的上传的函数
-        $result = $this->funcManager->invoke($this->tmpFunctionName, [
+        $result = $this->funcManager->invoke($tmpFunctionName, [
             "InvocationType" => "RequestResponse",
             "Qualifier" => "\$LATEST",
             "ClientContext" => "{}",
@@ -153,6 +155,10 @@ class FunctionManagerTest extends TestCase
 
         $retMsg = Utils::fromJSONString($result->Result->RetMsg);
 
+        echo $retMsg->env->TENCENTCLOUD_SECRETID, PHP_EOL;
+        echo $retMsg->env->TENCENTCLOUD_SECRETKEY, PHP_EOL;
+        echo $retMsg->env->TENCENTCLOUD_SESSIONTOKEN, PHP_EOL;
+
         // 获取临时凭证比较麻烦，在这里测试临时凭证
         putenv(Constants::ENV_RUNENV_SCF);
         putenv(Constants::ENV_SECRETID."=".$retMsg->env->TENCENTCLOUD_SECRETID);
@@ -166,7 +172,7 @@ class FunctionManagerTest extends TestCase
             "envId" => TestBase::$envId
         ]);
 
-        $result = $tcb->getFunctionManager()->getFunctionLogs($this->tmpFunctionName, [
+        $result = $tcb->getFunctionManager()->getFunctionLogs($tmpFunctionName, [
             "Offset" => 0,
             "Limit" => 3
         ]);
@@ -178,8 +184,21 @@ class FunctionManagerTest extends TestCase
         $this->assertGreaterThan(1, $result->TotalCount);
 
         // 删除函数
-        $result = $tcb->getFunctionManager()->deleteFunction($this->tmpFunctionName);
+        $result = $tcb->getFunctionManager()->deleteFunction($tmpFunctionName);
         $this->assertObjectHasAttribute("RequestId", $result);
+    }
+
+    private function tryDeleteFunction(string $functionName)
+    {
+        try {
+            $this->funcManager->deleteFunction($functionName);
+        }
+        catch (\Exception $e) {
+            echo "tryDeleteFunction: ", $e->getMessage();
+        }
+        finally {
+            echo "";
+        }
     }
 
     public function testCreateFunctionByZipFile() {
@@ -188,6 +207,9 @@ class FunctionManagerTest extends TestCase
         ];
 
         $functionName = "function_create_by_zip_file";
+
+        $this->tryDeleteFunction($functionName);
+
         $result = $this->funcManager->createFunction(
             $functionName,
             [
@@ -211,6 +233,8 @@ class FunctionManagerTest extends TestCase
         }
 
         $functionName = "function_create_by_zip_file_path";
+        $this->tryDeleteFunction($functionName);
+
         $result = $this->funcManager->createFunction(
             $functionName,
             [
