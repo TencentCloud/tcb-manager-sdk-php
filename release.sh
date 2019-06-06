@@ -20,7 +20,7 @@ namespace TcbManager;
 
 class Version
 {
-    const VERSION = "\"TCB-MANAGER-PHP_$@\"";
+    const VERSION = \"TCB-MANAGER-PHP/$@\";
 }
 """ > ${VERSION_FILE}
 
