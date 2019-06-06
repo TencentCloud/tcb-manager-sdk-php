@@ -3,6 +3,7 @@
 
 namespace TcbManager\Exceptions;
 
+
 use Exception;
 
 class TcbException extends Exception

@@ -13,7 +13,7 @@ use TencentCloudClient\Http\HttpClientProfile;
 class Api
 {
     /**
-     * @var Endpoint
+     * @var string
      */
     protected $endpoint;
 
@@ -30,14 +30,14 @@ class Api
     /**
      * Api constructor.
      * @param Credential        $credential 凭证
-     * @param Endpoint          $endpoint
+     * @param string            $endpoint
      * @param string            $version
      * @param string            $region     地域
      * @param HttpClientProfile $profile client配置
      */
     function __construct(
         Credential $credential,
-        Endpoint $endpoint,
+        string $endpoint,
         string $version,
         string $region = "",
         $profile = null
@@ -70,14 +70,14 @@ class Api
     /**
      * 基于当前API的认证信息，创建新的API
      *
-     * @param Endpoint          $endpoint
+     * @param string            $endpoint
      * @param string            $version
      * @param string            $region
      * @param HttpClientProfile $profile client配置
      * @return Api
      */
     public function clone(
-        Endpoint $endpoint,
+        string $endpoint,
         string $version,
         string $region = "",
         $profile = null

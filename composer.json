@@ -19,10 +19,9 @@
         "release": "sh release.sh"
     },
     "require": {
-        "php": ">=7.0.0",
+        "php": "^7.0.0",
         "ext-json": "*",
-        "tencentcloudbase/tencentcloud-client-php": "^1.0",
-        "myclabs/php-enum": "^1.7",
+        "tencentcloudbase/tencentcloud-client-php": "1.0.1",
         "nelexa/zip": "^3.1"
     },
     "require-dev": {

@@ -25,7 +25,7 @@ class AbstractService
     {
         $this->tcb = $tcb;
         $this->api = $tcb->getApi()->clone(
-            new Endpoint($this->endpoint),
+            $this->endpoint,
             $this->version,
             $this->region,
             $this->profile
