@@ -1,11 +1,10 @@
 <?php
 
-namespace TcbManager;
+namespace TcbManager\Api;
 
 
 use Exception;
-
-use TcbManager\Api\Endpoint;
+use TcbManager\Version;
 use TencentCloudClient\TCClient;
 use TencentCloudClient\Credential;
 use TencentCloudClient\Http\HttpClientProfile;
@@ -30,16 +29,14 @@ class Api
 
     /**
      * Api constructor.
-     * @param string            $secretId
-     * @param string            $secretKey
+     * @param Credential        $credential 凭证
      * @param Endpoint          $endpoint
      * @param string            $version
-     * @param string            $region 地域
+     * @param string            $region     地域
      * @param HttpClientProfile $profile client配置
      */
     function __construct(
-        string $secretId,
-        string $secretKey,
+        Credential $credential,
         Endpoint $endpoint,
         string $version,
         string $region = "",
@@ -48,12 +45,12 @@ class Api
         TCClient::setVersion(Version::VERSION);
 
         $this->endpoint = $endpoint;
-        $this->credential = new Credential($secretId, $secretKey);
+        $this->credential = $credential;
 
         $this->tcClient = new TCClient(
             $endpoint,
             $version,
-            $this->credential,
+            $credential,
             $region,
             $profile
         );
@@ -87,8 +84,7 @@ class Api
     )
     {
         $api = new Api(
-            $this->credential->getSecretId(),
-            $this->credential->getSecretKey(),
+            $this->credential,
             $endpoint,
             $version,
             $region,

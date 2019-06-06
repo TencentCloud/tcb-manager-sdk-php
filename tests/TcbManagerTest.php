@@ -21,6 +21,10 @@ final class TcbManagerTest extends TestCase
 
     public function test__construct_ExceptionFor_INVALID_PARAM()
     {
+        putenv(Constants::ENV_RUNENV);
+        putenv(Constants::ENV_SECRETID."=");
+        putenv(Constants::ENV_SECRETKEY."=");
+        putenv(Constants::ENV_SESSIONTOKEN."=");
         $this->expectExceptionMessage(TcbException::MISS_SECRET_INFO_IN_ARGS);
         new TcbManager([]);
     }
@@ -28,6 +32,9 @@ final class TcbManagerTest extends TestCase
     public function test__construct_ExceptionFor_INVALID_RUNTIME_ENVIRONMENT()
     {
         putenv(Constants::ENV_RUNENV_SCF);
+        putenv(Constants::ENV_SECRETID."=");
+        putenv(Constants::ENV_SECRETKEY."=");
+        putenv(Constants::ENV_SESSIONTOKEN."=");
         $this->expectExceptionMessage(TcbException::MISS_SECRET_INFO_IN_ENV);
         new TcbManager([]);
     }
@@ -51,6 +58,7 @@ final class TcbManagerTest extends TestCase
         putenv(Constants::ENV_RUNENV_SCF);
         putenv(Constants::ENV_SECRETID."=".TestBase::$secretId);
         putenv(Constants::ENV_SECRETKEY."=".TestBase::$secretKey);
+        putenv(Constants::ENV_SESSIONTOKEN."=".TestBase::$secretToken);
         $this->assertInstanceOf(TcbManager::class,  new TcbManager([]));
     }
 
@@ -58,6 +66,7 @@ final class TcbManagerTest extends TestCase
         $tcb = new TcbManager([
             "secretId" => TestBase::$secretId,
             "secretKey" => TestBase::$secretKey,
+            "secretToken" => TestBase::$secretToken,
         ]);
 
         $tcb->addEnvironment(TestBase::$envId);

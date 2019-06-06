@@ -4,9 +4,11 @@ namespace TcbManager;
 
 use InvalidArgumentException;
 use TcbManager\Exceptions\EnvException;
+use TcbManager\Api\Api;
 use TcbManager\Api\Endpoint;
 use TcbManager\Exceptions\TcbException;
 use TcbManager\Services\Functions\FunctionManager;
+use TencentCloudClient\Credential;
 
 /**
  * Class TcbManager
@@ -22,6 +24,7 @@ class TcbManager
     private $config = [
         "secretId" => "",
         "secretKey" => "",
+        "secretToken" => ""
     ];
 
     /**
@@ -78,12 +81,21 @@ class TcbManager
             && array_key_exists("secretKey", $options)) {
             $this->config["secretId"] = $options['secretId'];
             $this->config["secretKey"] = $options['secretKey'];
+
+            if (array_key_exists("secretToken", $options)) {
+                $this->config["secretToken"] = $options['secretToken'];
+            }
         }
         else {
             if (Runtime::isInSCF()) {
                 // 云函数运行环境中应保证
                 $this->config["secretId"] = getenv(Constants::ENV_SECRETID);
                 $this->config["secretKey"] = getenv(Constants::ENV_SECRETKEY);
+
+                if (getenv(Constants::ENV_SESSIONTOKEN)) {
+                    $this->config["secretToken"] = getenv(Constants::ENV_SESSIONTOKEN);
+                }
+
                 if (empty($this->config["secretId"])
                     || empty($this->config["secretKey"])) {
                     throw new TcbException(TcbException::MISS_SECRET_INFO_IN_ENV);
@@ -95,8 +107,11 @@ class TcbManager
         }
 
         $this->api = new Api(
-            $this->config["secretId"],
-            $this->config["secretKey"],
+            new Credential(
+                $this->config["secretId"],
+                $this->config["secretKey"],
+                $this->config["secretToken"]
+            ),
             new Endpoint(Endpoint::TCB),
             "2018-06-08"
         );

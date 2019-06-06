@@ -10,6 +10,7 @@ class TestBase
 {
     public static $secretId;
     public static $secretKey;
+    public static $secretToken = "";
     public static $envId;
 
     /**
@@ -21,10 +22,13 @@ class TestBase
     {
         self::$secretId = Config::$secretId;
         self::$secretKey = Config::$secretKey;
+        self::$secretToken = Config::$secretToken;
+
         self::$envId = Config::$envId;
         static::$tcb = TcbManager::init([
             "secretId" => Config::$secretId,
             "secretKey" => Config::$secretKey,
+            "secretToken" => Config::$secretToken,
             "envId" => Config::$envId
         ]);
     }

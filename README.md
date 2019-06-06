@@ -37,6 +37,7 @@ require_once "/path/to/tcb-manager-php/autoload.php"
 $tcbManager = TcbManager::init([
     "secretId" => "Your SecretId",
     "secretKey" => "Your SecretKey",
+    "secretToken" => "Your SecretToken", // 使用临时凭证需要此字段
     "envId" => "Your envId"  // TCB环境ID，可在腾讯云TCB控制台获取
 ]);
 ```
@@ -61,7 +62,8 @@ $tcbManager = TcbManager::init([
 $tcbManager = new TcbManager([
     "secretId" => "Your SecretId",
     "secretKey" => "Your SecretKey",
-    "envId" => "Your envId"
+    "secretToken" => "Your SecretToken", // 使用临时凭证需要此字段
+    "envId" => "Your envId"  // TCB环境ID，可在腾讯云TCB控制台获取
 ])
 ```
 
@@ -84,8 +86,8 @@ use TcbManager\TcbManager;
 // 1. 初始化 TcbManager
 $tcbManager = TcbManager::init([
     "secretId" => "Your SecretId",
-    "secretKey" => "Your SecretKey",
-    "envId" => "Your envId"
+    "secretToken" => "Your SecretToken", // 使用临时凭证需要此字段
+    "envId" => "Your envId"  // TCB环境ID，可在腾讯云TCB控制台获取
 ]);
 
 // 2. 获得云函数管理示例
@@ -146,10 +148,11 @@ stdClass Object
 * `new TcbManager(array $options)`
     
     * `$options: array` - 【可选】初始化参数，如果SDK运行在云函数中，可省略，显式传递的参数优先级更高
-      * `$secretId: string` - 腾讯云 SecretId，`$secretId` 与 `$secretKey` 必须同时传递
-      * `$secretKey: string` - 腾讯云 SecretKey，`$secretId` 与 `$secretKey` 必须同时传递
+      * `$secretId: string` - 腾讯云凭证 SecretId，`$secretId` 与 `$secretKey` 必须同时传递
+      * `$secretKey: string` - 腾讯云凭证 SecretKey，`$secretId` 与 `$secretKey` 必须同时传递
+      * `$secretToken: string` - 【可选】腾讯云临时凭证 `token`，传递此字段时意味着使用的是临时凭证，如果显式传递临时凭证，则此参数必传
       * `$envId: string` - 【可选】环境Id，因为后续的很多接口依赖于环境，在未传递的情况下，需要通过 `addEnvironment()` 添加环境方可进行后续接口调用
-    
+
 静态方法：
 
 * `static function init(array $options): TcbManager` - 初始化默认 `TcbManager` 对象实例，单例的。
@@ -162,6 +165,7 @@ stdClass Object
     $tcbManager = TcbManager::init([
         "secretId" => "Your SecretId",
         "secretKey" => "Your SecretKey",
+        "secretToken" => "Your SecretToken",
         "envId" => "Your envId"
     ]);
     ```
@@ -229,10 +233,13 @@ $funcManager = $tcbManager->getFunctionManager();
     }
     ```
     
-* `createFunction(string $functionName, string $sourceFilePath, string $handler, string $runtime, array $options = [])` - 创建函数
+* `createFunction(string $functionName, array $code, string $handler, string $runtime, array $options = [])` - 创建函数
 
     * `$functionName: string` - 函数名称
-    * `$sourceFilePath: string` - 函数源文件路径，可以是 `文件路径` 或 `目录路径`。注意目录下文件大小，压缩包限制20M
+    * `$code: array` - 源码资源，压缩包限制 `20M`，以下参数必选一种方式上传源码文件
+        * `$ZipFile: string` - 包含函数代码文件及其依赖项的 `zip` 格式文件 经过 `base64` 编码后的字符串
+        * `$ZipFilePath: string` - 包含函数代码文件及其依赖项的 `zip` 格式文件路径
+        * `$SourceFilePath: string` - 源码文件路径
     * `$handler: string` - 函数调用入口，指明调用云函数时需要从哪个文件中的哪个函数开始执行。
                    通常写为 `index.main_handler`，指向的是 `index.[ext]` 文件内的 `main_handler` 函数方法。
                    包含 `入口文件名` 和 `入口函数名`，格式：`入口文件名.入口函数名`，例如：`index.main_handler`，文件名后缀省略
@@ -255,7 +262,12 @@ $funcManager = $tcbManager->getFunctionManager();
     ```php
     $funcManager->createFunction(
         "functionName",
-        "path/to/source",
+        [
+           // 根据实际需要选择以下某种方式
+           "ZipFile" => "base64 zip file content"
+           // "ZipFilePath" => "path/to/zipFile"
+           // "SourceFilePath" => "path/to/source-code"
+        ],
         "index.main",
         "Php7",
         [
@@ -281,10 +293,13 @@ $funcManager = $tcbManager->getFunctionManager();
     
     以JSON对象描述，在PHP中为对应的数组结构，其他函数返回格式相同
 
-* `updateFunctionCode(string $functionName, string $sourceFilePath, string $handler, array $options = [])` - 更新云函数代码
+* `updateFunctionCode(string $functionName, string $code, string $handler, array $options = [])` - 更新云函数代码
     
     * `$functionName: string` - 函数名称
-    * `$sourceFilePath: string` - 函数源文件路径，同创建函数说明
+    * `$code: array` - 源码资源，压缩包限制 `20M`，以下参数必选一种方式上传源码文件
+        * `$ZipFile: string` - 包含函数代码文件及其依赖项的 `zip` 格式文件 经过 `base64` 编码后的字符串
+        * `$ZipFilePath: string` - 包含函数代码文件及其依赖项的 `zip` 格式文件路径
+        * `$SourceFilePath: string` - 源码文件路径
     * `$handler: string` - 函数调用入口，同创建函数说明
 
     返回字段及更多说明见 API 文档: https://cloud.tencent.com/document/api/583/18581
@@ -294,7 +309,12 @@ $funcManager = $tcbManager->getFunctionManager();
     ```php
     $funcManager->updateFunctionCode(
         "functionName",
-        "path/to/new-source-code-file-or-directory",
+        [
+           // 根据实际需要选择以下某种方式
+           "ZipFile" => "base64 zip file content"
+           // "ZipFilePath" => "path/to/zipFile"
+           // "SourceFilePath" => "path/to/source-code"
+        ],
         "index.main",
         "Nodejs8.9"
     );

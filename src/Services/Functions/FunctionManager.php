@@ -7,6 +7,7 @@ use Exception;
 use stdClass;
 
 use TcbManager\Api\Endpoint;
+use TcbManager\Exceptions\TcbException;
 use TcbManager\Services\AbstractService;
 use TcbManager\TcbManager;
 use TcbManager\Utils;
@@ -52,6 +53,27 @@ class FunctionManager extends AbstractService
     }
 
     /**
+     * @param array &$code
+     * @return string
+     */
+    static function makeZipFile(array &$code): string {
+        $zipFile = "";
+        if (array_key_exists("ZipFile", $code)) {
+            $zipFile = $code["ZipFile"];
+        } else if (array_key_exists("ZipFilePath", $code)) {
+            $zipFile = Utils::makeZipCodeFromZipFile($code["ZipFilePath"]);
+            unset($code["ZipFilePath"]);
+        // } else if (array_key_exists("ZipFileStream", $code)) {
+        //     $zipFile = Utils::makeZipCodeFromZipFileStream($code["ZipFileStream"]);
+        //     unset($code["ZipFileStream"]);
+        } else if (array_key_exists("SourceFilePath", $code)) {
+            $zipFile = Utils::makeZipCodeBySourceFile($code["SourceFilePath"]);
+            unset($code["SourceFilePath"]);
+        }
+        return $zipFile;
+    }
+
+    /**
      * 创建函数
      *
      * 注意：该函数可能调用成功，但是创建函数失败
@@ -59,7 +81,7 @@ class FunctionManager extends AbstractService
      * @link https://cloud.tencent.com/document/api/583/18586
      *
      * @param string $functionName
-     * @param string $sourceFilePath
+     * @param array $code
      * @param string $handler
      * @param string $runtime
      * @param array  $options
@@ -68,15 +90,17 @@ class FunctionManager extends AbstractService
      */
     public function createFunction(
         string $functionName,
-        string $sourceFilePath,
+        array $code,
         string $handler,
         string $runtime,
         array $options = []
     ): stdClass {
-        $zipFileData = Utils::makeZipCodeBySourceFile($sourceFilePath);
+        if (empty($code)) {
+            throw new Exception("Argument must has some invalid field!");
+        }
+
         return $this->request("createFunction", array_merge(
             [
-                // "Region" => $this->region,
                 "Namespace" => $this->namespace,
                 "Role" => "TCB_QcsRole",
                 "Stamp" => "MINI_QCBASE",
@@ -86,7 +110,15 @@ class FunctionManager extends AbstractService
                 "MemorySize" => 256,
                 "Timeout" => 3,
                 "FunctionName" => $functionName,
-                "Code" => ["ZipFile" => $zipFileData],
+                "Code" => array_merge([
+                    // 注释掉的部分通过 $code 透传
+                    // "CosBucketRegion" => $CosBucketRegion,
+                    // "CosBucketName" => $CosBucketName,
+                    // "CosObjectName" => $CosObjectName,
+                    // "TempCosObjectName" => $TempCosObjectName,
+                    // "DemoId" => $DemoId,
+                    "ZipFile" => self::makeZipFile($code)
+                ], $code),
                 "Handler" => $handler,
             ],
             $options
@@ -120,7 +152,7 @@ class FunctionManager extends AbstractService
      * @link https://cloud.tencent.com/document/api/583/18581
      *
      * @param string $functionName
-     * @param string $sourceFilePath
+     * @param array $code
      * @param string $handler
      * @param array $options
      * @return stdClass
@@ -128,17 +160,15 @@ class FunctionManager extends AbstractService
      */
     public function updateFunctionCode(
         string $functionName,
-        string $sourceFilePath,
+        array $code,
         string $handler,
         array $options = []
     ): stdClass {
-        $zipFileData = Utils::makeZipCodeBySourceFile($sourceFilePath);
         return $this->request("UpdateFunctionCode", array_merge(
             [
-                // "Region" => $this->region,
                 "Namespace" => $this->namespace,
                 "FunctionName" => $functionName,
-                "InlineZipFile" => $zipFileData,
+                "InlineZipFile" => self::makeZipFile($code),
                 "Handler" => $handler
             ],
             $options
@@ -163,7 +193,6 @@ class FunctionManager extends AbstractService
     ): stdClass {
         return $this->request("UpdateFunctionConfiguration", array_merge(
             [
-                // "Region" => $this->region,
                 "Namespace" => $this->namespace,
                 "FunctionName" => $functionName
             ],
@@ -184,7 +213,6 @@ class FunctionManager extends AbstractService
     public function listFunctions(): stdClass
     {
         return $this->request("ListFunctions", [
-            // "Region" => $this->region,
             "Namespace" => $this->namespace
         ]);
     }
@@ -203,7 +231,6 @@ class FunctionManager extends AbstractService
     public function getFunction(string $functionName): stdClass
     {
         return $this->request("GetFunction", [
-            // "Region" => $this->region,
             "Namespace" => $this->namespace,
             "FunctionName" => $functionName
         ]);
@@ -223,7 +250,6 @@ class FunctionManager extends AbstractService
     {
         return $this->request("Invoke", array_merge(
             [
-                // "Region" => $this->region,
                 "Namespace" => $this->namespace,
                 "FunctionName" => $functionName
             ],
@@ -245,7 +271,6 @@ class FunctionManager extends AbstractService
     {
         return $this->request("GetFunctionLogs", array_merge(
             [
-                // "Region" => $this->region,
                 "Namespace" => $this->namespace,
                 "FunctionName" => $functionName
             ],
