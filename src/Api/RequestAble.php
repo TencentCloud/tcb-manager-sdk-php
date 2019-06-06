@@ -5,8 +5,6 @@ namespace TcbManager\Api;
 
 
 use Exception;
-use TcbManager\Api;
-use TcbManager\ApiRequest;
 
 
 trait RequestAble

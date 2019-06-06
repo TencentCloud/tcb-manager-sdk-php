@@ -249,9 +249,9 @@ $funcManager = $tcbManager->getFunctionManager();
         * `Timeout: number` - 函数超时时间
         * `MemorySize: number` - 函数运行时内存大小，默认为 128M，可选范围 128MB-1536MB，并且以 128MB 为阶梯
         * `Environment: array` - 函数运行环境，见调用示例
-          * `Variables: array` - 环境变量
-            * `Key: string` - 变量的名称
-            * `Value: string` - 变量的值
+          * `Variables: array` - 环境变量，在函数运行时可通过在环境变量里获取到响应的值，PHP 中获取环境变量函数为 `getenv`。
+            * `Key: string` - 环境变量名，注意：避免使用系统常用的环境变量名导致系统环境变量出问题，建议用户设置的环境变量名采用统一前缀且大写，例如：`ENV_PROJECTNAME_[KeyName]`
+            * `Value: string` - 环境变量值
 
     注意：请在测试时在 TCB 控制台确认函数创建并部署成功，有可能创建成功，`createFunction` 成功返回，但是部署失败，部署失败的原因通常为 `$handler` 参数与源码包不对应。
 
@@ -274,7 +274,9 @@ $funcManager = $tcbManager->getFunctionManager();
            "Description" => "this is function description",
            "Environment" => [
                "Variables" => [
-                   ["Key" => "Key", "Value" => "Value"]
+                   ["Key" => "ENV_PROJNAME_VERSION", "Value" => "v1.3.5"],
+                   ["Key" => "ENV_PROJNAME_ENDPOINT", "Value" => "api.your-domain.com"]
+                   ["Key" => "ENV_PROJNAME_ES_HOST", "Value" => "es-cluster.your-domain.com"]
                ]
            ]
         ]
@@ -347,7 +349,9 @@ $funcManager = $tcbManager->getFunctionManager();
             "Timeout" => 10,
             "Environment" => [
                 "Variables" => [
-                    ["Key" => "Key", "Value" => "NewValue"]
+                   ["Key" => "ENV_PROJNAME_VERSION", "Value" => "v1.3.5"],
+                   ["Key" => "ENV_PROJNAME_ENDPOINT", "Value" => "api.your-domain.com"]
+                   ["Key" => "ENV_PROJNAME_ES_HOST", "Value" => "es-cluster.your-domain.com"]
                 ]
             ]
         ]

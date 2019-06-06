@@ -112,7 +112,7 @@ class TcbManager
                 $this->config["secretKey"],
                 $this->config["secretToken"]
             ),
-            new Endpoint(Endpoint::TCB),
+            Endpoint::TCB,
             "2018-06-08"
         );
 

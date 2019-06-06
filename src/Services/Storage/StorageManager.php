@@ -11,7 +11,7 @@ use TcbManager\TcbManager;
 class StorageManager extends AbstractService
 {
     /**
-     * @var strin API endpoint
+     * @var string API endpoint
      */
     protected $endpoint = "";
 
