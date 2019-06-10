@@ -15,7 +15,7 @@
         "issues": "https://github.com/TencentCloudBase/tcb-manager-php/issues"
     },
     "scripts": {
-        "test": "phpunit -v --configuration tests/phpunit.xml tests",
+        "test": "phpunit -v --process-isolation --globals-backup --configuration tests/phpunit.xml tests",
         "release": "sh release.sh"
     },
     "require": {

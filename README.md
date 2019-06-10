@@ -1,4 +1,13 @@
-# tcb-manager-php
+
+<h1 align="center">
+  <p align="center">tcb-manager-php</p>
+</h1>
+
+<div align="center">
+
+[![Build Status](https://travis-ci.org/TencentCloudBase/tcb-manager-php.svg?branch=master)](https://travis-ci.org/TencentCloudBase/tcb-manager-php)
+
+</div>
 
 ## 使用步骤
 

@@ -158,10 +158,11 @@ class FunctionManagerTest extends TestCase
         putenv(Constants::ENV_SECRETID."=".$retMsg->env->TENCENTCLOUD_SECRETID);
         putenv(Constants::ENV_SECRETKEY."=".$retMsg->env->TENCENTCLOUD_SECRETKEY);
         putenv(Constants::ENV_SESSIONTOKEN."=".$retMsg->env->TENCENTCLOUD_SESSIONTOKEN);
+
         $tcb = new TcbManager([
-            // "secretId" => $retMsg->env->TENCENTCLOUD_SECRETID,
-            // "secretKey" => $retMsg->env->TENCENTCLOUD_SECRETKEY,
-            // "secretToken" => $retMsg->env->TENCENTCLOUD_SESSIONTOKEN,
+             "secretId" => $retMsg->env->TENCENTCLOUD_SECRETID,
+             "secretKey" => $retMsg->env->TENCENTCLOUD_SECRETKEY,
+             "secretToken" => $retMsg->env->TENCENTCLOUD_SESSIONTOKEN,
             "envId" => TestBase::$envId
         ]);
 
