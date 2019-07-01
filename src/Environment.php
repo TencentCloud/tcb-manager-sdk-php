@@ -6,6 +6,7 @@ namespace TcbManager;
 use TcbManager\Api\RequestAble;
 use TcbManager\Exceptions\EnvException;
 use TcbManager\Exceptions\TcbException;
+use TencentCloudClient\Exception\TCException;
 use TcbManager\Services\Database\DatabaseManager;
 use TcbManager\Services\Storage\StorageManager;
 use TcbManager\Services\Functions\FunctionManager;
@@ -27,6 +28,18 @@ class Environment {
     private $functionManager;
 
     /**
+     * @var StorageManager
+     */
+    private $storageManagers = [];
+    private $storageManager;
+
+    /**
+     * @var DatabaseManager
+     */
+    private $databaseManagers = [];
+    private $databaseManager;
+
+    /**
      * Environment constructor.
      * @param string $id
      * @param TcbManager $tcb
@@ -46,10 +59,22 @@ class Environment {
 
         if (isset($result->EnvList) and count($result->EnvList) === 1) {
             $envInfo = $result->EnvList[0];
-            // $this->database = new Database($this->tcb, $envInfo['Databases'][0]);
-            // $this->storage = new Storage($this->tcb, $envInfo['Storages'][0]);
             $this->functionManager = new FunctionManager($this->tcb, $envInfo->Functions[0]);
+            $this->databaseManager = new DatabaseManager($this->tcb, $envInfo->Databases[0]);
+            $this->storageManager = new StorageManager($this->tcb, $envInfo->Storages[0]);
         }
+    }
+
+    /**
+     * @param string $action
+     * @param array $params
+     * @return mixed
+     * @throws TCException
+     */
+    public function requestWithEnv(string $action, array $params = [])
+    {
+        $params["EnvId"] = $this->id;
+        return $this->request($action, $params);
     }
 
     /**
@@ -60,22 +85,40 @@ class Environment {
         return $this->id;
     }
 
+
+    /**
+     * @return mixed
+     * @throws
+     */
+    public function describe()
+    {
+        return $this->requestWithEnv("DescribeEnvs");
+    }
+
     /**
      * @param string $namespace
      * @return FunctionManager
      */
-    public function getFunctionManager(string $namespace = "")
+    public function getFunctionManager(string $namespace = ""): FunctionManager
     {
         return $this->functionManager;
     }
 
     /**
-     * @return mixed
+     * @param string $bucket
+     * @return StorageManager
      */
-    public function describe()
+    public function getStorageManager(string $bucket = ""): StorageManager
     {
-        return $this->request("DescribeEnvs", [
-            "EnvId" => $this->id
-        ]);
+        return $this->storageManager;
+    }
+
+    /**
+     * @param string $instanceId
+     * @return DatabaseManager
+     */
+    public function getDatabaseManager(string $instanceId): DatabaseManager
+    {
+        return $this->databaseManager;
     }
 }

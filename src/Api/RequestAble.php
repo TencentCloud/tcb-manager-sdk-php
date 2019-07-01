@@ -4,7 +4,7 @@
 namespace TcbManager\Api;
 
 
-use Exception;
+use TencentCloudClient\Exception\TCException;
 
 
 trait RequestAble
@@ -16,9 +16,9 @@ trait RequestAble
 
     /**
      * @param string $action
-     * @param $params
+     * @param array $params
      * @return mixed
-     * @throws Exception
+     * @throws TCException
      */
     public function request(string $action, array $params)
     {

@@ -51,9 +51,10 @@ class EnvironmentManager {
     }
 
     /**
-     * @param string $envId 环境ID
+     * @param string $envId
+     *
      * @return bool
-     * @throws TcbException
+     * @throws EnvException
      */
     public function add(string $envId)
     {
