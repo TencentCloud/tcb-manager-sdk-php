@@ -26,12 +26,12 @@ class Environment {
     /**
      * @var TCB
      */
-    private $tcbDataApi;
+    private $tcb;
 
     /**
      * @var TcbManager
      */
-    private $tcb;
+    private $tcbManager;
 
     /**
      * @var FunctionManager
@@ -58,11 +58,11 @@ class Environment {
      * @throws EnvException
      * @throws \TencentCloudBase\Utils\TcbException
      */
-    public function __construct(string $id, TcbManager $tcb)
+    public function __construct(string $id, TcbManager $tcbManager)
     {
         $this->id = $id;
-        $this->tcb = $tcb;
-        $this->api = $tcb->getApi();
+        $this->tcbManager = $tcbManager;
+        $this->api = $tcbManager->getApi();
 
         $result = $this->describe();
 
@@ -70,26 +70,26 @@ class Environment {
             throw new EnvException(EnvException::ENV_ID_NOT_EXISTS);
         }
 
-        $this->tcbDataApi = new TCB([
-            "secretId" => $tcb->getApi()->getCredential()->getSecretId(),
-            "secretKey" => $tcb->getApi()->getCredential()->getSecretKey(),
+        $this->tcb = new TCB([
+            "secretId" => $tcbManager->getApi()->getCredential()->getSecretId(),
+            "secretKey" => $tcbManager->getApi()->getCredential()->getSecretKey(),
             "env" => $id
         ]);
 
         if (isset($result->EnvList) and count($result->EnvList) === 1) {
             $envInfo = $result->EnvList[0];
-            $this->functionManager = new FunctionManager($this->tcb, $envInfo->Functions[0]);
-            $this->databaseManager = new DatabaseManager($this->tcb, $envInfo->Databases[0]);
-            $this->storageManager = new StorageManager($this->tcb, $envInfo->Storages[0]);
+            $this->functionManager = new FunctionManager($this->tcbManager, $envInfo->Functions[0]);
+            $this->databaseManager = new DatabaseManager($this->tcbManager, $envInfo->Databases[0]);
+            $this->storageManager = new StorageManager($this->tcbManager, $envInfo->Storages[0]);
         }
     }
 
     /**
      * @return TCB
      */
-    public function getTcbDataApi()
+    public function getTcb()
     {
-        return $this->tcbDataApi;
+        return $this->tcb;
     }
 
     /**

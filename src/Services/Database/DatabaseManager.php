@@ -60,20 +60,20 @@ class DatabaseManager extends AbstractService
      */
     public function db()
     {
-        return $this->tcb->currentEnvironment()->getTcbDataApi()->getDatabase();
+        return $this->tcb->currentEnvironment()->getTcb()->getDatabase();
     }
 
     /**
      * 检查表是否存在
-     * @param string $tableName
+     * @param string $collectionName
      * @return object
      */
-    public function checkTableExists(string $tableName)
+    public function checkCollectionExists(string $collectionName)
     {
         try {
             $result = $this->request("DescribeTable", [
                 "Tag" => $this->instanceId,
-                "TableName" => $tableName
+                "TableName" => $collectionName
             ]);
             return Utils::fromArrayToObject([
                 "RequestId" => $result->RequestId,
@@ -90,30 +90,30 @@ class DatabaseManager extends AbstractService
     /**
      * 创建表/集合 - 如果表存在，则会报异常
      *
-     * @param string $tableName - 表/集合名
+     * @param string $collectionName - 表/集合名
      * @return mixed
      * @throws TCException
      */
-    public function createTable(string $tableName)
+    public function createCollection(string $collectionName)
     {
         return $this->request("CreateTable", [
             "Tag" => $this->instanceId,
-            "TableName" => $tableName
+            "TableName" => $collectionName
         ]);
     }
 
     /**
      * 创建表/集合 - 如果表存在，则会报异常
      *
-     * @param string $tableName - 表/集合名
+     * @param string $collectionName - 表/集合名
      * @return mixed
      * @throws TCException
      */
-    public function createTableIfNotExists(string $tableName)
+    public function createCollectionIfNotExists(string $collectionName)
     {
-        $existsResult = $this->checkTableExists($tableName);
+        $existsResult = $this->checkCollectionExists($collectionName);
         if (!$existsResult->Exists) {
-            $result = $this->createTable($tableName);
+            $result = $this->createCollection($collectionName);
             return Utils::fromArrayToObject([
                 "RequestId" => $result->RequestId,
                 "IsCreated" => true,
@@ -132,15 +132,15 @@ class DatabaseManager extends AbstractService
     /**
      * 删除表/集合 - 如果表/集合不存在，也会正常返回
      *
-     * @param string $tableName - 表/集合名
+     * @param string $collectionName - 表/集合名
      * @return mixed
      * @throws Exception
      */
-    public function deleteTable(string $tableName)
+    public function deleteCollection(string $collectionName)
     {
         return $this->request("DeleteTable", [
             "Tag" => $this->instanceId,
-            "TableName" => $tableName
+            "TableName" => $collectionName
         ]);
     }
 
@@ -153,30 +153,30 @@ class DatabaseManager extends AbstractService
      *  1. 索引创建时如果已经存在，则会先删除再创建索引
      *  2. 因为一次接口调用可同时创建多个索引，所以可能部分索引创建失败，部分创建成功，接口报异常
      *
-     * @param string $tableName
+     * @param string $collectionName
      * @param array $options
      * @return mixed
      * @throws TCException
      */
-    public function updateTable(string $tableName, array $options)
+    public function updateCollection(string $collectionName, array $options)
     {
         return $this->request("updateTable", array_merge([
             "Tag" => $this->instanceId,
-            "TableName" => $tableName,
+            "TableName" => $collectionName,
         ], $options));
     }
 
     /**
      * 查询表详细信息
-     * @param string $tableName
+     * @param string $collectionName
      * @return mixed
      * @throws TCException
      */
-    public function describeTable(string $tableName)
+    public function describeCollection(string $collectionName)
     {
         return $this->request("DescribeTable", [
             "Tag" => $this->instanceId,
-            "TableName" => $tableName
+            "TableName" => $collectionName
         ]);
     }
 
@@ -186,7 +186,7 @@ class DatabaseManager extends AbstractService
      * @return mixed
      * @throws Exception
      */
-    public function listTables(array $options = [])
+    public function listCollections(array $options = [])
     {
         if (!array_key_exists("MgoOffset", $options)) {
             $options["MgoOffset"] = self::DEFAULT_MGO_OFFSET;
@@ -195,21 +195,31 @@ class DatabaseManager extends AbstractService
             $options["MgoLimit"] = self::DEFAULT_MGO_LIMIT;
         }
 
-        return $this->request("ListTables", array_merge([
+        $result = $this->request("ListTables", array_merge([
             "Tag" => $this->instanceId,
         ], $options));
+
+        // 和TCB一致
+        $result->Collections = $result->Tables;
+        unset($result->Tables);
+        foreach ($result->Collections as $collection) {
+            $collection->CollectionName = $collection->TableName;
+            unset($collection->TableName);
+        }
+
+        return $result;
     }
 
     /**
      * 检查索引是否存在
-     * @param string $tableName
+     * @param string $collectionName
      * @param string $indexName
      * @return object
      * @throws Exception, TCException
      */
-    public function checkIndexExists(string $tableName, string $indexName)
+    public function checkIndexExists(string $collectionName, string $indexName)
     {
-        $result = $this->describeTable($tableName);
+        $result = $this->describeCollection($collectionName);
         $exists = Utils::arraySearch(
             $result->Indexes,
             "Name",

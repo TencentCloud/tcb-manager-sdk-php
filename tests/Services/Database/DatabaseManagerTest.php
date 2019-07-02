@@ -17,27 +17,27 @@ class DatabaseManagerTest extends TestCase
      */
     private $databaseManager;
 
-    private $tableName1 = "tcb_test_table_1";
-    private $tableName2 = "tcb_test_table_2";
-    private $tableName3 = "tcb_test_table_3";
+    private $collectionName1 = "tcb_test_collection_1";
+    private $collectionName2 = "tcb_test_collection_2";
+    private $collectionName3 = "tcb_test_collection_3";
 
-    private $tableAlreadyExists = "tcb_already_exists";
-    private $tableNeverExists = "tcb_never_exists";
+    private $collectionAlreadyExists = "tcb_already_exists";
+    private $collectionNeverExists = "tcb_never_exists";
 
-    private $tableForDescribe = "tcb_table_for_describe";
-    private $tableForList = "tcb_table_for_list";
+    private $collectionForDescribe = "tcb_collection_for_describe";
+    private $collectionForList = "tcb_collection_for_list";
 
-    private $tableNeedUpdate = "tcb_table_need_update";
+    private $collectionNeedUpdate = "tcb_collection_need_update";
 
-    private $tableNeedImport = "tcb_table_need_import";
-    private $tableNeedExport = "tcb_table_need_export";
+    private $collectionNeedImport = "tcb_collection_need_import";
+    private $collectionNeedExport = "tcb_collection_need_export";
 
     private $dataFilePath = __DIR__.DS."data.csv";
 
     public function recreateTable(string $tableName)
     {
-        $this->databaseManager->deleteTable($tableName);
-        $this->databaseManager->createTable($tableName);
+        $this->databaseManager->deleteCollection($tableName);
+        $this->databaseManager->createCollection($tableName);
     }
 
     protected function setUp(): void
@@ -58,9 +58,9 @@ class DatabaseManagerTest extends TestCase
     {
         $db = $this->databaseManager->db();
 
-        $this->databaseManager->deleteTable("users");
+        $this->databaseManager->deleteCollection("users");
 
-        $result = $db->createCollection("users");
+        $db->createCollection("users");
 
         $collection = $db->collection("users");
 
@@ -82,26 +82,26 @@ class DatabaseManagerTest extends TestCase
 
     public function testCreateTable()
     {
-        $this->databaseManager->deleteTable($this->tableName1);
+        $this->databaseManager->deleteCollection($this->collectionName1);
 
-        $result = $this->databaseManager->createTable($this->tableName1);
+        $result = $this->databaseManager->createCollection($this->collectionName1);
         $this->assertHasRequestId($result);
 
         $this->expectException(TCException::class);
-        $result = $this->databaseManager->createTable($this->tableName1);
+        $result = $this->databaseManager->createCollection($this->collectionName1);
         $this->assertHasRequestId($result);
     }
 
     public function testCreateTableIfNotExists()
     {
-        $this->databaseManager->deleteTable($this->tableName2);
+        $this->databaseManager->deleteCollection($this->collectionName2);
 
-        $result = $this->databaseManager->createTableIfNotExists($this->tableName2);
+        $result = $this->databaseManager->createCollectionIfNotExists($this->collectionName2);
 
         $this->assertHasRequestId($result);
         $this->assertEquals(true, $result->IsCreated);
 
-        $result = $this->databaseManager->createTableIfNotExists($this->tableName2);
+        $result = $this->databaseManager->createCollectionIfNotExists($this->collectionName2);
 
         $this->assertHasRequestId($result);
         $this->assertEquals(false, $result->IsCreated);
@@ -109,36 +109,36 @@ class DatabaseManagerTest extends TestCase
 
     public function testDeleteTable()
     {
-        $this->databaseManager->createTableIfNotExists($this->tableName3);
+        $this->databaseManager->createCollectionIfNotExists($this->collectionName3);
 
-        $result = $this->databaseManager->deleteTable($this->tableName3);
+        $result = $this->databaseManager->deleteCollection($this->collectionName3);
         $this->assertHasRequestId($result);
         // 可删除不存在的表，并无两样
-        $result = $this->databaseManager->deleteTable($this->tableName3);
+        $result = $this->databaseManager->deleteCollection($this->collectionName3);
         $this->assertHasRequestId($result);
     }
 
     public function testCheckTableExistsWithAlreadyExistsTable()
     {
-        $this->databaseManager->createTableIfNotExists($this->tableAlreadyExists);
+        $this->databaseManager->createCollectionIfNotExists($this->collectionAlreadyExists);
 
-        $result = $this->databaseManager->checkTableExists($this->tableAlreadyExists);
+        $result = $this->databaseManager->checkCollectionExists($this->collectionAlreadyExists);
         $this->assertHasRequestId($result);
         $this->assertEquals(true, $result->Exists);
     }
 
     public function testCheckTableExistsWithNeverExistsTable()
     {
-        $result = $this->databaseManager->checkTableExists($this->tableNeverExists);
+        $result = $this->databaseManager->checkCollectionExists($this->collectionNeverExists);
         $this->assertHasRequestId($result);
         $this->assertEquals(false, $result->Exists);
     }
 
     public function testDescribeTableAlreadyExists()
     {
-        $this->databaseManager->createTableIfNotExists($this->tableForDescribe);
+        $this->databaseManager->createCollectionIfNotExists($this->collectionForDescribe);
 
-        $result = $this->databaseManager->describeTable($this->tableForDescribe);
+        $result = $this->databaseManager->describeCollection($this->collectionForDescribe);
         $this->assertHasRequestId($result);
         $this->assertEquals(1, $result->IndexNum);
         $this->assertEquals(1, count($result->Indexes));
@@ -146,25 +146,26 @@ class DatabaseManagerTest extends TestCase
 
     public function testListTable()
     {
-        $this->databaseManager->createTableIfNotExists($this->tableForList);
+        $this->databaseManager->createCollectionIfNotExists($this->collectionForList);
 
-        $result = $this->databaseManager->listTables();
+        $result = $this->databaseManager->listCollections();
+
         $this->assertHasRequestId($result);
-        $this->assertGreaterThan(0, $result->Tables);
+        $this->assertGreaterThan(0, $result->Collections);
         $this->assertGreaterThan(0, $result->Pager->Total);
         $this->assertEquals(0, $result->Pager->Offset);
         $this->assertEquals(100, $result->Pager->Limit);
 
         $exists = false;
-        foreach ($result->Tables as $table) {
-            if ($table->TableName === $this->tableForList) {
+        foreach ($result->Collections as $collection) {
+            if ($collection->CollectionName === $this->collectionForList) {
                 $exists = true;
             }
         }
         $this->assertEquals(true, $exists);
 
         $MgoOffset = 0; $MgoLimit = 20;
-        $result = $this->databaseManager->listTables([
+        $result = $this->databaseManager->listCollections([
             "MgoOffset" => $MgoOffset,
             "MgoLimit" => $MgoLimit,
         ]);
@@ -174,9 +175,9 @@ class DatabaseManagerTest extends TestCase
 
     public function testUpdateTable()
     {
-        $this->recreateTable($this->tableNeedUpdate);
+        $this->recreateTable($this->collectionNeedUpdate);
 
-        $result = $this->databaseManager->updateTable($this->tableNeedUpdate, [
+        $result = $this->databaseManager->updateCollection($this->collectionNeedUpdate, [
             "CreateIndexes" => [
                 [
                     "IndexName" => "index_a",
@@ -213,12 +214,12 @@ class DatabaseManagerTest extends TestCase
         $this->assertHasRequestId($result);
 
         $result = $this->databaseManager->checkIndexExists(
-            $this->tableNeedUpdate,
+            $this->collectionNeedUpdate,
             "index_to_be_delete"
         );
         $this->assertEquals(true, $result->Exists);
 
-        $result = $this->databaseManager->updateTable($this->tableNeedUpdate, [
+        $result = $this->databaseManager->updateCollection($this->collectionNeedUpdate, [
             "CreateIndexes" => [
                 [
                     "IndexName" => "index_b_1",
@@ -240,13 +241,13 @@ class DatabaseManagerTest extends TestCase
         $this->assertHasRequestId($result);
 
         $result = $this->databaseManager->checkIndexExists(
-            $this->tableNeedUpdate,
+            $this->collectionNeedUpdate,
             "index_to_be_delete"
         );
         $this->assertEquals(false, $result->Exists);
 
         $result = $this->databaseManager->checkIndexExists(
-            $this->tableNeedUpdate,
+            $this->collectionNeedUpdate,
             "index_b_1"
         );
         $this->assertEquals(true, $result->Exists);
@@ -254,10 +255,10 @@ class DatabaseManagerTest extends TestCase
 
     public function testImport()
     {
-        $this->recreateTable($this->tableNeedImport);
+        $this->recreateTable($this->collectionNeedImport);
 
         $result = $this->databaseManager->import(
-            $this->tableNeedImport,
+            $this->collectionNeedImport,
             [
                 "FilePath" => $this->dataFilePath,
                 // "ObjectKey" => "data.csv"
@@ -279,12 +280,12 @@ class DatabaseManagerTest extends TestCase
 
     public function testExport()
     {
-        $this->recreateTable($this->tableNeedExport);
+        $this->recreateTable($this->collectionNeedExport);
 
         $result = $this->databaseManager->export(
-            $this->tableNeedExport,
+            $this->collectionNeedExport,
             [
-                "ObjectKey" => $this->tableNeedExport.".json"
+                "ObjectKey" => $this->collectionNeedExport.".json"
             ],
             [
                  "Fields" => "_id,name",
