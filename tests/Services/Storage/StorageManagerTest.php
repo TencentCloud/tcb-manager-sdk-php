@@ -60,17 +60,17 @@ class StorageManagerTest extends TestCase
 
     public function testPutObject()
     {
-        $result = $this->storageManager->putObject("data/数据/数据.txt", __DIR__);
-        // $result = $this->storageManager->putObject("data/数据/数据.txt", "");
+        $result = $this->storageManager->putObject("data/data/data.txt", __DIR__);
+        // $result = $this->storageManager->putObject("data/data/data.txt", "");
 
         $this->assertHasRequestId($result);
         $this->assertArrayHasKey("ETag", $result->Headers);
 
-        $url = $this->storageManager->getTemporaryObjectUrl("data/数据/数据.txt");
+        $url = $this->storageManager->getTemporaryObjectUrl("data/data/data.txt");
         $this->assertTrue(!empty($url));
 
-        $result = $this->storageManager->putObject("data/数据/X|Y|Z.txt", __DIR__);
-        $url = $this->storageManager->getTemporaryObjectUrl("data/数据/X|Y|Z.txt");
+        $result = $this->storageManager->putObject("data/data/X|Y|Z.txt", __DIR__);
+        $url = $this->storageManager->getTemporaryObjectUrl("data/data/X|Y|Z.txt");
         $this->assertTrue(!empty($url));
     }
 
