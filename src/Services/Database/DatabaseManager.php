@@ -9,7 +9,9 @@ use TcbManager\Api\Endpoint;
 use TcbManager\Services\AbstractService;
 use TcbManager\TcbManager;
 use TcbManager\Utils;
+use TencentCloudBase\Database\Db;
 use TencentCloudClient\Exception\TCException;
+use TcbManager\Exceptions\EnvException;
 use Webmozart\PathUtil\Path;
 
 
@@ -50,6 +52,15 @@ class DatabaseManager extends AbstractService
         $this->instanceId = $instanceInfo->InstanceId;
         $this->region = $instanceInfo->Region;
         $this->status = $instanceInfo->Status;
+    }
+
+    /**
+     * @return Db
+     * @throws EnvException
+     */
+    public function db()
+    {
+        return $this->tcb->currentEnvironment()->getTcbDataApi()->getDatabase();
     }
 
     /**

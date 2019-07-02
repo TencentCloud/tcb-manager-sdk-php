@@ -5,7 +5,7 @@ namespace TcbManager;
 
 use TcbManager\Api\RequestAble;
 use TcbManager\Exceptions\EnvException;
-use TcbManager\Exceptions\TcbException;
+use TencentCloudBase\TCB;
 use TencentCloudClient\Exception\TCException;
 use TcbManager\Services\Database\DatabaseManager;
 use TcbManager\Services\Storage\StorageManager;
@@ -18,7 +18,19 @@ use TcbManager\Services\Functions\FunctionManager;
 class Environment {
     use RequestAble;
 
+    /**
+     * @var string
+     */
     private $id;
+
+    /**
+     * @var TCB
+     */
+    private $tcbDataApi;
+
+    /**
+     * @var TcbManager
+     */
     private $tcb;
 
     /**
@@ -44,6 +56,7 @@ class Environment {
      * @param string $id
      * @param TcbManager $tcb
      * @throws EnvException
+     * @throws \TencentCloudBase\Utils\TcbException
      */
     public function __construct(string $id, TcbManager $tcb)
     {
@@ -57,12 +70,26 @@ class Environment {
             throw new EnvException(EnvException::ENV_ID_NOT_EXISTS);
         }
 
+        $this->tcbDataApi = new TCB([
+            "secretId" => $tcb->getApi()->getCredential()->getSecretId(),
+            "secretKey" => $tcb->getApi()->getCredential()->getSecretKey(),
+            "env" => $id
+        ]);
+
         if (isset($result->EnvList) and count($result->EnvList) === 1) {
             $envInfo = $result->EnvList[0];
             $this->functionManager = new FunctionManager($this->tcb, $envInfo->Functions[0]);
             $this->databaseManager = new DatabaseManager($this->tcb, $envInfo->Databases[0]);
             $this->storageManager = new StorageManager($this->tcb, $envInfo->Storages[0]);
         }
+    }
+
+    /**
+     * @return TCB
+     */
+    public function getTcbDataApi()
+    {
+        return $this->tcbDataApi;
     }
 
     /**

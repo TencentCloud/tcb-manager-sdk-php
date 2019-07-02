@@ -54,6 +54,32 @@ class DatabaseManagerTest extends TestCase
         $this->assertObjectHasAttribute("RequestId", $result);
     }
 
+    public function testDB()
+    {
+        $db = $this->databaseManager->db();
+
+        $this->databaseManager->deleteTable("users");
+
+        $result = $db->createCollection("users");
+
+        $collection = $db->collection("users");
+
+        $countResult = $collection->count();
+        $this->assertEquals(0, $countResult["total"]);
+
+        $collection->add(['name' => 'ben']);
+
+        $queryResult = $collection->where([
+            'name'=> "ben"
+        ])->get();
+
+        $this->assertEquals(1, count($queryResult["data"]));
+
+        $countResult = $collection->count();
+
+        $this->assertEquals(1, $countResult["total"]);
+    }
+
     public function testCreateTable()
     {
         $this->databaseManager->deleteTable($this->tableName1);

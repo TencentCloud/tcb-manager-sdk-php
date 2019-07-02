@@ -1193,6 +1193,26 @@ $databaseManager = $tcbManager->getDatabaseManager();
     Collections[N].CollectionName | String | 集合名称
     Collections[N].DocCount       | Number | 文档数量
 
+* `db()` - 获取数据库实例
+
+    该SDK内嵌 `tcb-php-sdk`，该函数返回 `TencentCloudBase\Database\Db` 实例。
+    
+    调用示例：
+    
+    ```php
+    $db = $databaseManager->db();
+    $db->createCollection("users");
+    $collection = $db->collection("users");
+    $countResult = $collection->count();
+    $collection->add(['name' => 'ben']);
+    $queryResult = $collection->where([
+        'name'=> "ben"
+    ])->get();
+    ```
+    
+    说明文档见：https://github.com/TencentCloudBase/tcb-php-sdk/blob/master/docs/database.md
+    
+
 ### StorageManager - 对象存储管理
 
 `StorageManager` 实例可以对文件（对象存储）进行管理。
