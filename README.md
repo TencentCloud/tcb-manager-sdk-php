@@ -685,14 +685,14 @@ $funcManager = $tcbManager->getFunctionManager();
 $databaseManager = $tcbManager->getDatabaseManager();
 ```
 
-* `createTable(string $tableName): object` - 创建表，如果表名已经存在，则会抛出异常
+* `createCollection(string $collectionName): object` - 创建表，如果表名已经存在，则会抛出异常
 
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
 
     调用示例：
     
     ```php
-    $result = $databaseManager->createTable("tableName")
+    $result = $databaseManager->createCollection("collectionName")
     ```
 
     返回示例：
@@ -709,14 +709,14 @@ $databaseManager = $tcbManager->getDatabaseManager();
     -------------|---------|------------------
     RequestId    | string  | 请求唯一标识
 
-* `createTableIfNotExists(string $tableName): object` - 创建表，如果表已存在，则不会创建表，该方法无API接口直接对应
+* `createCollectionIfNotExists(string $collectionName): object` - 创建表，如果表已存在，则不会创建表，该方法无API接口直接对应
 
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
     
     调用示例：
     
     ```php
-    $result = $databaseManager->createTableIfNotExists("tableName")
+    $result = $databaseManager->createCollectionIfNotExists("collectionName")
     ```
 
     返回示例：
@@ -740,14 +740,14 @@ $databaseManager = $tcbManager->getDatabaseManager();
     IsCreated    | Boolean | 是否创建表
     ExistsResult | Object  | 检查表是否存在返回结果
 
-* `checkTableExists(string $tableName): object` - 检查表是否存在，该方法无API接口直接对应
+* `checkCollectionExists(string $collectionName): object` - 检查表是否存在，该方法无API接口直接对应
 
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
     
     调用示例：
     
     ```php
-    $result = $databaseManager->checkTableExists("tableAlreadyExists")
+    $result = $databaseManager->checkCollectionExists("collectionAlreadyExists")
     ```
 
     返回示例：
@@ -767,14 +767,14 @@ $databaseManager = $tcbManager->getDatabaseManager();
     Exists       | Boolean | 表是否已经存在
 
 
-* `deleteTable(string $tableName): object` - 删除表 - 如果表不存在，也会正常返回
+* `deleteCollection(string $collectionName): object` - 删除表 - 如果表不存在，也会正常返回
 
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
 
     调用示例：
     
     ```php
-    $result = $databaseManager->deleteTable("tableAlreadyExists")
+    $result = $databaseManager->deleteCollection("collectionAlreadyExists")
     ```
 
     返回示例：
@@ -791,9 +791,9 @@ $databaseManager = $tcbManager->getDatabaseManager();
     -------------|---------|------------------
     RequestId    | string  | 请求唯一标识
 
-* `updateTable(string $tableName, array $options): object` - 更新表/集合
+* `updateCollection(string $collectionName, array $options): object` - 更新表/集合
 
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
     * `$options: array` - 选项
         * `$CreateIndexes: array` - 需要创建的索引列表
             * `$IndexName: string` - 索引名称
@@ -813,7 +813,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     调用示例
     
     ```php
-    $result = $databaseManager->updateTable("tableAlreadyExists", [
+    $result = $databaseManager->updateCollection("collectionAlreadyExists", [
         "CreateIndexes" => [
             [
                 "IndexName" => "index_a",
@@ -850,7 +850,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     ```
     
     ```php
-    $result = $databaseManager->updateTable("tableAlreadyExists", [
+    $result = $databaseManager->updateCollection("collectionAlreadyExists", [
         "DropIndexes" => [
             ["IndexName" => "index_to_be_delete"]
         ]
@@ -873,12 +873,12 @@ $databaseManager = $tcbManager->getDatabaseManager();
     Exists       | Boolean | 表是否已经存在
 
 
-* `describeTable(string $tableName): object` - 查询表详细信息，表不存在会抛出异常
+* `describeCollection(string $collectionName): object` - 查询表详细信息，表不存在会抛出异常
 
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
 
     ```php
-    $result = $databaseManager->describeTable("tableAlreadyExists");
+    $result = $databaseManager->describeCollection("collectionAlreadyExists");
     ```
     
     ```json
@@ -922,7 +922,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     Indexes[N].Accesses[N].Ops    | Number | 索引命中次数
     Indexes[N].Accesses[N].Since  | String | 命中次数从何时开始计数
 
-* `listTables(array $options = []): object` - 查询所有表信息
+* `listCollections(array $options = []): object` - 查询所有表信息
 
     * `$options: array = []` - 可选，偏移量
       * `$MgoOffset: number = 0` - 可选，偏移量
@@ -931,7 +931,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     调用示例：
     
     ```php
-    $result = $databaseManager->listTables([
+    $result = $databaseManager->listCollections([
         "MgoOffset" => 100,
         "MgoLimit" => 10,
     ])
@@ -942,9 +942,9 @@ $databaseManager = $tcbManager->getDatabaseManager();
     ```
     {
         "RequestId": "d812272a-ae93-489b-aaa7-d6c8a1b2b753",
-        "Tables": [
+        "Collections": [
             {
-                "TableName": "users",
+                "CollectionName": "users",
                 "Count": 2,
                 "Size": 131,
                 "IndexCount": 1,
@@ -961,30 +961,30 @@ $databaseManager = $tcbManager->getDatabaseManager();
 
     返回字段描述：
 
-    Argument             |  Type  |         Description
-    -------------------- | ------ | ----------------------------
-    RequestId            | string | 请求唯一标识
-    Tables               | Array  | 集合列表
-    Tables[N].TableName  | String | 集合名称
-    Tables[N].Count      | Number | 集合中文档数量
-    Tables[N].Size       | Number | 集合占用空间大小，字节
-    Tables[N].IndexCount | Number | 集合中索引个数
-    Tables[N].IndexSize  | Number | 集合中索引占用空间大小，字节
-    Pager                | Object | 本次查询分页信息
-    Pager.Offset         | Number | 偏移量
-    Pager.Limit          | Number | 限制数量
-    Pager.Total          | Number | 集合数量
+    Argument                      |  Type  | Description
+    ----------------------------- | ------ | ----------------------------
+    RequestId                     | string | 请求唯一标识
+    Collections                   | Array  | 集合列表
+    Collections[N].CollectionName | String | 集合名称
+    Collections[N].Count          | Number | 集合中文档数量
+    Collections[N].Size           | Number | 集合占用空间大小，字节
+    Collections[N].IndexCount     | Number | 集合中索引个数
+    Collections[N].IndexSize      | Number | 集合中索引占用空间大小，字节
+    Pager                         | Object | 本次查询分页信息
+    Pager.Offset                  | Number | 偏移量
+    Pager.Limit                   | Number | 限制数量
+    Pager.Total                   | Number | 集合数量
 
-* `checkIndexExists(string $tableName, string $indexName): object` - 检查索引是否存在
+* `checkIndexExists(string $collectionName, string $indexName): object` - 检查索引是否存在
         
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
     * `$indexName: string` - 索引名
     
     调用示例：
     
     ```php
     $result = $databaseManager->checkIndexExists(
-        "tableAlreadyExists",
+        "collectionAlreadyExists",
         "index_to_be_delete"
     )
     ```
@@ -1006,7 +1006,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     Exists    | Boolean | 索引是否存在
 
 
-* `import(string $tableName, array $file, array $options = []): object` - 导入数据，立即返回，迁移状态（成功|失败）需要通过 `migrateStatus` 查询
+* `import(string $collectionName, array $file, array $options = []): object` - 导入数据，立即返回，迁移状态（成功|失败）需要通过 `migrateStatus` 查询
 
     导入数据需要先将上传到该环境（同一个EnvId）下的对象存储中，所以会在对象存储中创建对象。
     
@@ -1014,7 +1014,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     所以该接口无法判断导入是否完成，
     所以该对象用完后需要手动删除，可以通过使用代码轮询迁移状态完成后，通过对象存储接口删除。
     
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
     * `$file: array` - 数据，以下方式必选一种
       * `$FilePath: string` - 本地数据文件路径
       * `$ObjectKey: string` - 本 TCB 环境下对象存储Key
@@ -1028,7 +1028,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     
     ```php
     $databaseManager->import(
-        $this->tableAlreadyExists,
+        $this->collectionAlreadyExists,
         [
             "ObjectKey" => "data.csv"
         ],
@@ -1056,9 +1056,9 @@ $databaseManager = $tcbManager->getDatabaseManager();
     RequestId | string  | 请求唯一标识
     JobId     | Number  | 任务ID，用于在 `migrateStatus` 接口查询迁移状态
 
-* `export(string $tableName, array $file, array $options = []): object` - 导出数据，立即返回，迁移状态（成功|失败）需要通过 `migrateStatus` 查询
+* `export(string $collectionName, array $file, array $options = []): object` - 导出数据，立即返回，迁移状态（成功|失败）需要通过 `migrateStatus` 查询
 
-    * `$tableName: string` - 表名
+    * `$collectionName: string` - 表名
     * `$file: array` - 数据，以下方式必选一种
       * `$ObjectKey: string` - 本 TCB 环境下对象存储Key
     * `$options: array` - 可选参数
@@ -1150,7 +1150,7 @@ $databaseManager = $tcbManager->getDatabaseManager();
     ErrorMsg      | String  | 迁移失败的原因
     FileUrl       | String  | 文件下载链接，仅在数据库导出中有效
 
-* `distribution(string $tableName, array $file, array $options = []): object` - 数据分布
+* `distribution(string $collectionName, array $file, array $options = []): object` - 数据分布
     
     请求示例：
 
@@ -1168,11 +1168,11 @@ $databaseManager = $tcbManager->getDatabaseManager();
           "DocCount": 8
         },
         {
-          "CollectionName": "tcb_test_table_3",
+          "CollectionName": "tcb_test_collection_3",
           "DocCount": 0
         },
         {
-          "CollectionName": "test_table",
+          "CollectionName": "test_collection",
           "DocCount": 0
         },
         {
@@ -1192,6 +1192,26 @@ $databaseManager = $tcbManager->getDatabaseManager();
     Collections                   | Array  | 集合列表
     Collections[N].CollectionName | String | 集合名称
     Collections[N].DocCount       | Number | 文档数量
+
+* `db()` - 获取数据库实例
+
+    该SDK内嵌 `tcb-php-sdk`，该函数返回 `TencentCloudBase\Database\Db` 实例。
+    
+    调用示例：
+    
+    ```php
+    $db = $databaseManager->db();
+    $db->createCollection("users");
+    $collection = $db->collection("users");
+    $countResult = $collection->count();
+    $collection->add(['name' => 'ben']);
+    $queryResult = $collection->where([
+        'name'=> "ben"
+    ])->get();
+    ```
+    
+    说明文档见：https://github.com/TencentCloudBase/tcb-php-sdk/blob/master/docs/database.md
+
 
 ### StorageManager - 对象存储管理
 
