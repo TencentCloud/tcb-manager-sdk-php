@@ -37,10 +37,11 @@
       * [`updateCollection(string $collectionName, array $options): object` - 更新集合](#updateCollectionstring-collectionName-array-options-object---更新集合)
       * [`describeCollection(string $collectionName): object` - 查询集合详细信息](#describeCollectionstring-collectionName-object---查询集合详细信息)
       * [`listCollections(array $options = []): object` - 查询所有集合信息](#listCollectionsarray-options---object---查询所有集合信息)
+      * [`checkIndexExists(string $collectionName, string $indexName): object` - 检查索引是否存在](#checkIndexExistsstring-collectionName-string-indexName-object---检查索引是否存在)
       * [`import(string $collectionName, array $file, array $options = []): object` - 导入数据](#importstring-collectionName-array-file-array-options---object---导入数据)
       * [`export(string $collectionName, array $file, array $options = []): object` - 导出数据](#exportstring-collectionName-array-file-array-options---object---导出数据)
       * [`migrateStatus(int $jobId): object` - 迁移（导入|导出）状态查询](#migrateStatusint-jobId-object---迁移导入导出状态查询)
-      * [`distribution(string $collectionName, array $file, array $options = []): object` - 数据分布](#distributionstring-collectionName-array-file-array-options---object---数据分布)
+      * [`distribution(): object` - 数据分布](#distribution-object---数据分布)
       * [`db()` - 获取数据库实例](#db---获取数据库实例)
     * [StorageManager - 对象存储管理](#StorageManager---对象存储管理)
       * [`putObject(string $key, string $path, array $options = []): object` - 上传单个对象](#putObjectstring-key-string-path-array-options---object---上传单个对象)
@@ -191,7 +192,7 @@ stdClass Object
 约定：
 
 1. 所有对应于云API的函数命名都和云API一致，但是采用小驼峰风格；
-2. 必选参数都对应都出现在函数签名上，可选的透传参数与云API参数保持一致，且大小写一致，非小驼峰风格；
+2. 必选参数都对应出现在函数签名上，可选的透传参数与云API参数保持一致，且大小写一致，非小驼峰风格；
 3. 为与API接口保持一致，所有 API 调用返回的 `JSON` 数据全部反序列化为 PHP 的 `stdClass` 对象，非数组对象。
 
 公共返回参数：
@@ -209,7 +210,7 @@ RequestId | String | 唯一请求 ID，每次请求都会返回。定位问题�
 构造方法：
 
 #### `new TcbManager(array $options)`
-    
+
 * `$options: array` - 【可选】初始化参数，如果SDK运行在云函数中，可省略，显式传递的参数优先级更高
   * `$secretId: string` - 腾讯云凭证 SecretId，`$secretId` 与 `$secretKey` 必须同时传递
   * `$secretKey: string` - 腾讯云凭证 SecretKey，`$secretId` 与 `$secretKey` 必须同时传递
@@ -1001,7 +1002,7 @@ Pager.Offset                  | Number | 偏移量
 Pager.Limit                   | Number | 限制数量
 Pager.Total                   | Number | 集合数量
 
-* `checkIndexExists(string $collectionName, string $indexName): object` - 检查索引是否存在
+#### `checkIndexExists(string $collectionName, string $indexName): object` - 检查索引是否存在
 
 * `$collectionName: string` - 集合名
 * `$indexName: string` - 索引名
@@ -1046,7 +1047,7 @@ Exists    | Boolean | 索引是否存在
   * `$ObjectKeyPrefix: string = tmp/db-imports/` - 对象存储 `Key` 前缀
   * `$FileType: string` - 文件类型：`csv` 或 `json`，如果为传递此参数，默认为文件后缀名，注意使用正确的后缀名。
   * `$StopOnError: boolean` - 遇到错误时是否停止导入。
-  * `$ConflictMode: array` - 冲突处理方式：`insert` 或 `upsert`
+  * `$ConflictMode: string` - 冲突处理方式：`insert` 或 `upsert`
 
 调用示例：
 
@@ -1176,7 +1177,7 @@ RecordFail    | Integer | 迁移失败的数据条数
 ErrorMsg      | String  | 迁移失败的原因
 FileUrl       | String  | 文件下载链接，仅在数据库导出中有效
 
-#### `distribution(string $collectionName, array $file, array $options = []): object` - 数据分布
+#### `distribution(): object` - 数据分布
 
 请求示例：
 
@@ -1480,7 +1481,7 @@ https://6465-demo-619e0a-1251267563.tcb.qcloud.la/MapOS%E6%A0%87%E5%87%86%E5%8C%
 * `$src: string` - 本地路径
 * `$options: array = []` - 可选参数
     * `$prefix: string` - 对象存储的指定 `key` 前缀，即路径，默认为根路径
-
+  
 调用示例：
 
 ```php
@@ -1526,7 +1527,7 @@ $storageManager->remove(["prefix" => "src/"])
 
 * `$options: array = []` - 可选参数
     * `$prefix: string` - 对象存储的指定 `key` 前缀，即路径，默认为根路径
-
+  
 调用示例：
 
 ```php
