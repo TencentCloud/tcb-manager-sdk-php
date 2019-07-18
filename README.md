@@ -1494,14 +1494,14 @@ $storageManager->upload($src, ["prefix" => "abc"])
 
 下载目录 `$options["prefix"]` 中的文件到本地的 `$dst` 路径下
 
-* `$src: string` - 本地路径
+* `$dst: string` - 本地路径
 * `$options: array = []` - 可选参数
     * `$prefix: string` - 对象存储的指定 `key` 前缀，即路径，默认为根路径
 
 调用示例：
 
 ```php
-$storageManager->upload($src, ["prefix" => "src/"])
+$storageManager->upload($dst, ["prefix" => "src/"])
 ```
 
 该接口无返回值
