@@ -18,11 +18,6 @@ use TcbManager\Services\Storage\StorageManager;
  */
 class TcbManager
 {
-    /**
-     * @var Api
-     */
-    private $api;
-
     private $config = [
         "secretId" => "",
         "secretKey" => "",

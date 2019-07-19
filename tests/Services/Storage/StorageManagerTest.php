@@ -37,25 +37,14 @@ class StorageManagerTest extends TestCase
 
     public function testGetTempObjectUrl()
     {
-        $url = $this->storageManager->getTemporaryObjectUrl("data/.gitkeep");
+        $url = $this->storageManager->getTemporaryObjectUrl("data/data/data.txt");
         $this->assertEquals(200, (new Client())->get($url)->getStatusCode());
-
-        $url = $this->storageManager->getTemporaryObjectUrl("not-exists.txt");
-        $this->assertEquals("", $url);
     }
 
     public function testGetTempObjectUrlWithNotExistsKey()
     {
-        $url = $this->storageManager->getTemporaryObjectUrl(
-            "not-exists-key",
-            ["checkObjectExists" => false]
-        );
-        $this->assertNotEquals("", $url);
-
-        $url = $this->storageManager->getTemporaryObjectUrl(
-            "not-exists-key"
-        );
-        $this->assertEquals("", $url);
+        $this->expectException(Exception::class);
+        $this->storageManager->getTemporaryObjectUrl("not-exists-key");
     }
 
     public function testPutObject()
@@ -64,14 +53,14 @@ class StorageManagerTest extends TestCase
         // $result = $this->storageManager->putObject("data/data/data.txt", "");
 
         $this->assertHasRequestId($result);
-        $this->assertArrayHasKey("ETag", $result->Headers);
+       // $this->assertArrayHasKey("ETag", $result->Headers);
 
-        $url = $this->storageManager->getTemporaryObjectUrl("data/data/data.txt");
-        $this->assertTrue(!empty($url));
+       $url = $this->storageManager->getTemporaryObjectUrl("data/data/data.txt");
+       $this->assertTrue(!empty($url));
 
-        $result = $this->storageManager->putObject("data/data/X|Y|Z.txt", __DIR__);
-        $url = $this->storageManager->getTemporaryObjectUrl("data/data/X|Y|Z.txt");
-        $this->assertTrue(!empty($url));
+       $result = $this->storageManager->putObject("data/data/X|Y|Z.txt", __DIR__);
+       $url = $this->storageManager->getTemporaryObjectUrl("data/data/X|Y|Z.txt");
+       $this->assertTrue(!empty($url));
     }
 
     public function testDeleteObject()
@@ -83,8 +72,8 @@ class StorageManagerTest extends TestCase
 
         $result = $this->storageManager->deleteObject("data/trash/A.txt");
 
+        $this->expectException(Exception::class);
         $url = $this->storageManager->getTemporaryObjectUrl("data/trash/A.txt");
-        $this->assertTrue(empty($url));
     }
 
     public function testHeadObject()
