@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "859e5b629ed9f262ab526e75d2068b4d",
+    "content-hash": "a84c92463e47193fd21ffc71930767ee",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -448,16 +448,16 @@
         },
         {
             "name": "tencentcloudbase/tencentcloud-client-php",
-            "version": "1.1.2",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TencentCloudBase/tencentcloud-client-php.git",
-                "reference": "e546c49d5aeba6f362e6e651489f0addc1c5bc8c"
+                "reference": "402f0e2f7abb61642440ec987f33a65db9f19f78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TencentCloudBase/tencentcloud-client-php/zipball/e546c49d5aeba6f362e6e651489f0addc1c5bc8c",
-                "reference": "e546c49d5aeba6f362e6e651489f0addc1c5bc8c",
+                "url": "https://api.github.com/repos/TencentCloudBase/tencentcloud-client-php/zipball/402f0e2f7abb61642440ec987f33a65db9f19f78",
+                "reference": "402f0e2f7abb61642440ec987f33a65db9f19f78",
                 "shasum": ""
             },
             "require": {
@@ -494,7 +494,7 @@
                 "tencentcloud",
                 "tencentcloudbase"
             ],
-            "time": "2019-07-01T11:43:28+00:00"
+            "time": "2019-07-19T11:42:36+00:00"
         },
         {
             "name": "webmozart/assert",
