@@ -54,7 +54,7 @@ class Environment {
     /**
      * Environment constructor.
      * @param string $id
-     * @param TcbManager $tcb
+     * @param TcbManager $tcbManager
      * @throws EnvException
      * @throws \TencentCloudBase\Utils\TcbException
      */

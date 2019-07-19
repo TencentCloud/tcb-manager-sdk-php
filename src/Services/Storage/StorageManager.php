@@ -83,17 +83,22 @@ class StorageManager extends AbstractService
             ? $options["expires"]
             : "10 minutes";
 
-        $checkObjectExists = isset($options["checkObjectExists"])
-            ? $options["checkObjectExists"]
-            : true;
+        // 直接计算COS签名的URL
+        $url = $this->api->calcObjectUrl($key, $this->cdnDomain, strtotime($expires) - strtotime("now"));
 
-        $url = $this->api->calcObjectUrl($key, $this->cdnDomain, $expires);
-
-        if ($checkObjectExists) {
-            $result = $this->headObject($key);
-            if (!isset($result->Headers["ETag"])) {
-                $url = "";
+        $envId = $this->tcb->currentEnvironment()->getId();
+        try {
+            $result = $this->tcb->currentEnvironment()->getTcb()->getStorage()->getTempFileURL([
+                "fileList" => [
+                    ["fileID" => "cloud://$envId.$this->bucket/$key", "maxAge" => 100000]
+                ]
+            ]);
+            if (isset($result["fileList"][0]["tempFileURL"])) {
+                $url = $result["fileList"][0]["tempFileURL"];
             }
+        } catch (Exception $e) {
+            // $url = "";
+            throw new Exception("ObjectNotExists");
         }
 
         return $url;
@@ -145,11 +150,23 @@ class StorageManager extends AbstractService
             throw new Exception("ValidPrefix: $prefix");
         }
 
-        return $this->api->operateObject("PUT", TCUtils::key_join($prefix, $key), array_merge([
-                "headers" => $headers,
-                "body" => fopen($filePath, "r")
-            ])
-        );
+        $result = $this->tcb->currentEnvironment()->getTcb()->getStorage()->uploadFile([
+            "cloudPath" => TCUtils::key_join($prefix, $key),
+            "fileContent" => fopen($filePath, "r")
+        ]);
+
+        return (object)[
+            "RequestId" => $result["requestId"],
+            "Headers" => [],
+            "Body" => null
+        ];
+
+//        $result = $this->api->operateObject("PUT", TCUtils::key_join($prefix, $key), array_merge([
+//                "headers" => $headers,
+//                "body" => fopen($filePath, "r")
+//            ])
+//        );
+//        return $result;
     }
 
     /**
@@ -228,7 +245,7 @@ class StorageManager extends AbstractService
      *
      * @return object
      * @throws GuzzleException
-     * @throws TCException
+     * @throws Exception
      */
     public function getObject(string $key, string $target)
     {
@@ -236,7 +253,8 @@ class StorageManager extends AbstractService
             $target = Path::join(getcwd(), $target);
         };
         Utils::tryMkdir(pathinfo($target, PATHINFO_DIRNAME));
-        return $this->api->operateObject("GET", $key, array_merge([
+        $url = $this->getTemporaryObjectUrl($key);
+        return $this->api->pureRequest("GET", $url, array_merge([
                 "headers" => [],
                 "sink" => $target
             ])
