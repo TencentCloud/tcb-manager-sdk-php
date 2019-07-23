@@ -8,7 +8,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "tencentcloudbase/tcb-manager-php": "dev-master"
+        "tencentcloudbase/tcb-manager-php": "^1.2.1"
     },
     "require-dev": {
     }
