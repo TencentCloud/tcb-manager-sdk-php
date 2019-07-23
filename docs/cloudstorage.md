@@ -47,18 +47,12 @@ $storageManager->putObject("/path/to/file", "path/to/asserts")
 $storageManager->putObject("/image/head.ico", "/workspace/projcect")
 ```
 
-**返回示例**（删除了公共响应字段）
+**返回示例**
 
 ```
 stdClass Object
 (
-    [RequestId] => NWQxMzM1YjdfMmE5ZDA4MDlfNTRmXzc5NmJiNA==
-    [Headers] => Array
-        (
-            [ETag] => "afed0acbedb862908dcccccd8c375e0e"
-        )
-
-    [Body] => 
+    [RequestId] => 1563804348002_58102
 )
 ```
 
@@ -67,8 +61,6 @@ stdClass Object
 参数名           |  类型    | 描述
 --------------- | ------ | -----------
 RequestId       | String | 请求唯一标识
-Headers[N].ETag | String | 对象的 ETag 值
-Body            | NULL   | 该接口无 body
 
 ### 删除单个对象
 
@@ -97,12 +89,7 @@ $storageManager->deleteObject($key)
 ```
 stdClass Object
 (
-    [RequestId] => NWQxMzM1MjFfN2RjNTFjMDlfMjFmYjdfN2U0Mjk5
-    [Headers] => Array
-        (
-        )
-
-    [Body] => 
+    [RequestId] => 1563804680285_12662
 )
 ```
 
@@ -137,33 +124,7 @@ $storageManager->getObject($key, $target)
 
 **返回值示例**
 
-该接口会同时将对象写入 $target 指定路径。
-
-```txt
-stdClass Object
-(
-    [RequestId] => NWQxMzU0NTFfMzRhNzAzMDlfYTFmOF84NDAxMmQ=
-    [Headers] => Array
-        (
-            [Accept-Ranges] => bytes
-            [ETag] => "401b30e3b8b5d629635a5c613cdb7919"
-            [Last-Modified] => Wed, 26 Jun 2019 19:17:37 GMT
-        )
-
-    [Body] => 
-)
-```
-
-**返回字段描述**
-
-参数名                 |  类型    | 描述
---------------------- | ------ | ------------------
-RequestId             | String | 请求唯一标识
-Headers.ETag          | String | 对象的 ETag 值
-Headers.Last-Modified | String | 对象的最后修改时间
-Body                  | NULL   | 该接口无 Body
-
-同时，该接口会将对象内容写入文件
+该接口无返回值。该接口会同时将对象写入 $target 指定路径。
 
 ### 获取对象列表
 
@@ -177,13 +138,13 @@ listObjects(array $options = []): object
 
 #### 参数说明
 
-参数名              |  类型    | 描述
+参数名              |  类型          | 描述
 -------------------|---------------|-------------------
-$options         | Array         | 可选参数
- ⁃ prefix        | String        | 对象键匹配前缀，限定响应中只包含指定前缀的对象键，例如：src/，表示以 src 或 dist 为前缀的对象
- ⁃ delimiter     | Boolean       | 一个字符的分隔符，用于对 prefix 进行分组
- ⁃ max-keys      | Number        | 单次返回最大的条目数量，默认值为1000，最大为1000
- ⁃ marker        | Number        | ObjectKey，所有列出条目从 marker 开始，如果不能一次全部返回，则可通过此字段跳过
+$options           | Array         | 可选参数
+ ⁃ prefix          | String        | 对象键匹配前缀，限定响应中只包含指定前缀的对象键，例如：src/，表示以 src 或 dist 为前缀的对象
+ ⁃ delimiter       | Boolean       | 一个字符的分隔符，用于对 prefix 进行分组
+ ⁃ max-keys        | Number        | 单次返回最大的条目数量，默认值为1000，最大为1000
+ ⁃ marker          | Number        | ObjectKey，所有列出条目从 marker 开始，如果不能一次全部返回，则可通过此字段跳过
 
 **调用示例**
 
@@ -285,8 +246,7 @@ $options               | Array         | 可选参数
 
 ```php
 $url = $stroageManager->getTemporaryObjectUrl("functionName", [
-    "expires" => "10 minutes",
-    "checkObjectExists" => true
+    "expires" => "10 minutes"
 ]);
 ```
 

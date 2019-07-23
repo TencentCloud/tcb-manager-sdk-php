@@ -68,19 +68,12 @@ class StorageManagerTest extends TestCase
         $this->storageManager->putObject("data/trash/A.txt", __DIR__);
 
         $url = $this->storageManager->getTemporaryObjectUrl("data/trash/A.txt");
+
         $this->assertTrue(!empty($url));
 
         $result = $this->storageManager->deleteObject("data/trash/A.txt");
-
         $this->expectException(Exception::class);
         $url = $this->storageManager->getTemporaryObjectUrl("data/trash/A.txt");
-    }
-
-    public function testHeadObject()
-    {
-        $key = "data/.gitkeep";
-        $result = $this->storageManager->headObject($key);
-        $this->assertHasRequestId($result);
     }
 
     public function testGetObject()
@@ -92,15 +85,13 @@ class StorageManagerTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testOptionsObject()
+    public function testGetObjectNotExists()
     {
-        $key = "data/.gitkeep";
-        $this->expectException(TCException::class);
-        $result = $this->storageManager->optionsObject($key, [
-            "Origin" => "example.com",
-            "Access-Control-Request-Method" => "GET",
-            "Access-Control-Request-Headers" => ""
-        ]);
+        $key = "not-exists-key";
+        $target = __DIR__ . "/data/download/data/not-exists-key";
+        $this->expectException(Exception::class);
+        $result = $this->storageManager->getObject($key, $target);
+        $this->assertTrue(true);
     }
 
     public function testListObjects()
@@ -131,7 +122,16 @@ class StorageManagerTest extends TestCase
         $this->assertEmpty(array_diff([], $keys));
 
         $dir = Path::join(__DIR__, "data/tmp");
-        $files = ["upload/index.js", "upload/.gitignore", "upload/文档.doc", "upload/lib/index.js"];
+        $files = [
+            "upload/index.js",
+            "upload/.gitignore",
+            "upload/文档.doc",
+            "upload/lib/index.js",
+            "upload/src/a.js",
+            "upload/src/b.js",
+            "upload/src/b.js",
+            "upload/src/转义%20%26%3D%40.js",
+        ];
         $this->mkEmptyFiles($dir, $files);
 
         $this->storageManager->upload(Path::join($dir, "upload"), [
@@ -158,6 +158,9 @@ class StorageManagerTest extends TestCase
         //     "prefix" => "upload/",
         // ]);
 
+        $this->storageManager->remove(["prefix" => "upload/src/"]);
+        $keys = $this->storageManager->keys(["prefix" => "upload/src/"]);
+        $this->assertEmpty(array_diff([], $keys));
         $this->storageManager->remove(["prefix" => "upload/"]);
         $keys = $this->storageManager->keys(["prefix" => "upload/"]);
         $this->assertEmpty(array_diff([], $keys));
