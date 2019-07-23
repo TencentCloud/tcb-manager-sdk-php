@@ -72,6 +72,18 @@ class StorageManager extends AbstractService
 
     /**
      * @param string $key
+     *
+     * @return string
+     * @throws \TcbManager\Exceptions\EnvException
+     */
+    private function calcFileId(string $key)
+    {
+        $envId = $this->tcb->currentEnvironment()->getId();
+        return "cloud://$envId.$this->bucket/$key";
+    }
+
+    /**
+     * @param string $key
      * @param array $options
      *
      * @return string
@@ -84,24 +96,18 @@ class StorageManager extends AbstractService
             : "10 minutes";
 
         // 直接计算COS签名的URL
-        $url = $this->api->calcObjectUrl($key, $this->cdnDomain, strtotime($expires) - strtotime("now"));
-
-        $envId = $this->tcb->currentEnvironment()->getId();
-        try {
-            $result = $this->tcb->currentEnvironment()->getTcb()->getStorage()->getTempFileURL([
-                "fileList" => [
-                    ["fileID" => "cloud://$envId.$this->bucket/$key", "maxAge" => 100000]
-                ]
-            ]);
-            if (isset($result["fileList"][0]["tempFileURL"])) {
-                $url = $result["fileList"][0]["tempFileURL"];
-            }
-        } catch (Exception $e) {
-            // $url = "";
+        // $url = $this->api->calcObjectUrl($key, $this->cdnDomain, strtotime($expires) - strtotime("now"));
+        $result = $this->tcb->currentEnvironment()->getTcb()->getStorage()->getTempFileURL([
+            "fileList" => [
+                ["fileID" => $this->calcFileId($key), "maxAge" => strtotime($expires) - strtotime("now")]
+            ]
+        ]);
+        $file = $result["fileList"][0];
+        if (isset($file["code"]) && $file["code"] === "STORAGE_FILE_NONEXIST") {
             throw new Exception("ObjectNotExists");
         }
 
-        return $url;
+        return $file["tempFileURL"];
     }
 
     /**
@@ -138,12 +144,6 @@ class StorageManager extends AbstractService
             $filePath = Path::join(getcwd(), $filePath);
         };
 
-        $headers = [];
-
-        if (isset($options["headers"])) {
-            $headers = array_merge($headers, $options["headers"]);
-        }
-
         $prefix = isset($options["prefix"]) ? $options["prefix"] : "";
 
         if (!TCUtils::prefix_valid($prefix)) {
@@ -156,81 +156,28 @@ class StorageManager extends AbstractService
         ]);
 
         return (object)[
-            "RequestId" => $result["requestId"],
-            "Headers" => [],
-            "Body" => null
+            "RequestId" => $result["requestId"]
         ];
-
-//        $result = $this->api->operateObject("PUT", TCUtils::key_join($prefix, $key), array_merge([
-//                "headers" => $headers,
-//                "body" => fopen($filePath, "r")
-//            ])
-//        );
-//        return $result;
     }
 
     /**
-     * DELETE Object
-     *
-     * 接口请求可以在 COS 的 Bucket 中将一个文件（Object）删除。该操作需要请求者对 Bucket 有 WRITE 权限。
-     *
-     * @link https://cloud.tencent.com/document/api/436/7743
-     *
      * @param string $key
      *
      * @return object
-     * @throws GuzzleException
-     * @throws TCException
+     * @throws \TcbManager\Exceptions\EnvException
+     * @throws \TencentCloudBase\Utils\TcbException
      */
     public function deleteObject(string $key)
     {
-        return $this->api->operateObject("DELETE", $key, array_merge([
-                "headers" => [
-                ]
-            ])
-        );
-    }
+        $result = $this->tcb->currentEnvironment()->getTcb()->getStorage()->deleteFile([
+            "fileList" => [
+                $this->calcFileId($key)
+            ],
+        ]);
 
-    /**
-     * HEAD Object
-     *
-     * 接口请求可以获取对应 Object 的 meta 信息数据，HEAD 的权限与 GET 的权限一致。
-     *
-     * @link https://cloud.tencent.com/document/api/436/7745
-     *
-     * @param string $key
-     * @return object
-     * @throws
-     */
-    public function headObject(string $key)
-    {
-        return $this->api->operateObject("HEAD", $key, array_merge([
-                "headers" => [
-                ]
-            ])
-        );
-    }
-
-    /**
-     * OPTIONS Object
-     *
-     * 接口实现 Object 跨域访问配置的预请求。
-     *
-     * @link https://cloud.tencent.com/document/api/436/8288
-     *
-     * @param string $key
-     * @param array $headers
-     *
-     * @return object
-     * @throws GuzzleException
-     * @throws TCException
-     */
-    public function optionsObject(string $key, array $headers)
-    {
-        return $this->api->operateObject("OPTIONS", $key, array_merge([
-                "headers" => $headers
-            ])
-        );
+        return (object)[
+            "RequestId" => $result["requestId"]
+        ];
     }
 
     /**
@@ -253,12 +200,14 @@ class StorageManager extends AbstractService
             $target = Path::join(getcwd(), $target);
         };
         Utils::tryMkdir(pathinfo($target, PATHINFO_DIRNAME));
-        $url = $this->getTemporaryObjectUrl($key);
-        return $this->api->pureRequest("GET", $url, array_merge([
-                "headers" => [],
-                "sink" => $target
-            ])
-        );
+
+        $result = $this->tcb->currentEnvironment()->getTcb()->getStorage()->downloadFile([
+            "fileID" => $this->calcFileId($key),
+            "tempFilePath" => $target
+        ]);
+        if (isset($result["code"]) && $result["code"] === "STORAGE_FILE_NONEXIST") {
+            throw new Exception("ObjectNotExists");
+        }
     }
 
     /**

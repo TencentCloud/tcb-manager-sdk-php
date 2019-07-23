@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a84c92463e47193fd21ffc71930767ee",
+    "content-hash": "6ffec5885c7c765bcb613a81c80bc63d",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -402,16 +402,16 @@
         },
         {
             "name": "tencentcloudbase/tcb-php-sdk",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TencentCloudBase/tcb-php-sdk.git",
-                "reference": "3841f5637746ab629f01203160d611eb34e672cc"
+                "reference": "d2a48663bb1944551cc1a5ff5dfbd70f4b4fe0c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TencentCloudBase/tcb-php-sdk/zipball/3841f5637746ab629f01203160d611eb34e672cc",
-                "reference": "3841f5637746ab629f01203160d611eb34e672cc",
+                "url": "https://api.github.com/repos/TencentCloudBase/tcb-php-sdk/zipball/d2a48663bb1944551cc1a5ff5dfbd70f4b4fe0c0",
+                "reference": "d2a48663bb1944551cc1a5ff5dfbd70f4b4fe0c0",
                 "shasum": ""
             },
             "require": {
@@ -437,14 +437,14 @@
             "authors": [
                 {
                     "name": "heyli",
+                    "role": "Developer",
                     "email": "lcxfs1991@gmail.com",
-                    "homepage": "https://github.com/lcxfs1991",
-                    "role": "Developer"
+                    "homepage": "https://github.com/lcxfs1991"
                 }
             ],
             "description": "tencent cloud base sdk for php",
             "homepage": "https://github.com/TencentCloudBase/tcb-php-sdk",
-            "time": "2019-06-20T08:45:54+00:00"
+            "time": "2019-07-23T05:18:32+00:00"
         },
         {
             "name": "tencentcloudbase/tencentcloud-client-php",
