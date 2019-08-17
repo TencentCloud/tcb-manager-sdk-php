@@ -37,11 +37,16 @@ class TestBase
             self::$envId = Config::$envId;
         }
 
+        //  echo self::$secretId, PHP_EOL;
+        //  echo self::$secretKey, PHP_EOL;
+        //  echo self::$secretToken, PHP_EOL;
+        //  echo self::$envId, PHP_EOL;
+
         static::$tcb = TcbManager::init([
-            "secretId" => Config::$secretId,
-            "secretKey" => Config::$secretKey,
-            "secretToken" => Config::$secretToken,
-            "envId" => Config::$envId
+            "secretId" => self::$secretId,
+            "secretKey" => self::$secretKey,
+            "secretToken" => self::$secretToken,
+            "envId" => self::$envId
         ]);
     }
 }
