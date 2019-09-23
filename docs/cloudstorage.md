@@ -305,7 +305,7 @@ $options      | Array         | 可选参数
 **调用示例**
 
 ```php
-$storageManager->upload($dst, ["prefix" => "src/"])
+$storageManager->download($dst, ["prefix" => "src/"])
 ```
 
 该接口无返回值。
