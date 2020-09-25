@@ -26,6 +26,8 @@ class EnvironmentManager {
      */
     private $current = null;
 
+    private $region = 'ap-shanghai';
+
     /**
      * @var TcbManager
      */
@@ -35,6 +37,7 @@ class EnvironmentManager {
     {
         $this->tcb = $tcb;
         $this->api = $tcb->getApi();
+        $this->region = $tcb->getRegion();
     }
 
     /**

@@ -109,8 +109,7 @@ class DatabaseManagerTest extends TestCase
 
     public function testDeleteTable()
     {
-        $this->databaseManager->createCollectionIfNotExists($this->collectionName3);
-
+        $this->databaseManager->deleteCollection($this->collectionName3);
         $result = $this->databaseManager->deleteCollection($this->collectionName3);
         $this->assertHasRequestId($result);
         // 可删除不存在的表，并无两样
@@ -139,9 +138,9 @@ class DatabaseManagerTest extends TestCase
         $this->databaseManager->createCollectionIfNotExists($this->collectionForDescribe);
 
         $result = $this->databaseManager->describeCollection($this->collectionForDescribe);
+
         $this->assertHasRequestId($result);
-        $this->assertEquals(1, $result->IndexNum);
-        $this->assertEquals(1, count($result->Indexes));
+        $this->assertEquals($result->IndexNum, count($result->Indexes));
     }
 
     public function testListTable()

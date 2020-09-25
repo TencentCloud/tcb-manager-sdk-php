@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use TcbManager\Exceptions\EnvException;
 use TcbManager\Api\Api;
 use TcbManager\Api\Endpoint;
+use TcbManager\Api\EndpointType;
 use TcbManager\Exceptions\TcbException;
 use TcbManager\Services\Database\DatabaseManager;
 use TcbManager\Services\Functions\FunctionManager;
@@ -18,11 +19,52 @@ use TcbManager\Services\Storage\StorageManager;
  */
 class TcbManager
 {
+    private $region = 'ap-shanghai';
+
     private $config = [
         "secretId" => "",
         "secretKey" => "",
         "secretToken" => ""
     ];
+
+    public static $ENDPOINTS = [
+        "TCB_API" => Endpoint::TCB_API,
+        "TCB" => Endpoint::TCB,
+        "SCF" => Endpoint::SCF,
+        "FLEXDB" => Endpoint::FLEXDB,
+        "COS" => Endpoint::COS
+    ];
+
+    /**
+     * 设置 Endpoint
+     * @param string $service
+     * @param string $endpoint
+     */
+    public static function setEndpoint(string $service, string $endpoint) {
+        if (array_key_exists($service, TcbManager::$ENDPOINTS) && $endpoint !== "") {
+            TcbManager::$ENDPOINTS[$service] = $endpoint;
+        }
+    }
+
+    /**
+     * 获取 Endpoint
+     * @param string $service
+     *
+     * @return string
+     */
+    public static function getEndpoint(string $service): string {
+        if (array_key_exists($service, static::$ENDPOINTS)) {
+            return static::$ENDPOINTS[$service];
+        }
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegion(): string {
+        return $this->region;
+    }
 
     /**
      * @return Api
@@ -106,14 +148,19 @@ class TcbManager
             }
         }
 
+        if (array_key_exists("region", $options)) {
+            $this->region = $options["region"];
+        }
+
         $this->api = new Api(
             new Credential(
                 $this->config["secretId"],
                 $this->config["secretKey"],
                 $this->config["secretToken"]
             ),
-            Endpoint::TCB,
-            "2018-06-08"
+            TcbManager::getEndpoint(EndpointType::TCB),
+            "2018-06-08",
+            $this->region
         );
 
         $this->environmentManager = new EnvironmentManager($this);

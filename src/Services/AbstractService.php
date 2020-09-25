@@ -4,6 +4,7 @@
 namespace TcbManager\Services;
 
 use TcbManager\Api\Endpoint;
+use TcbManager\Api\EndpointType;
 use TcbManager\Api\RequestAble;
 use TcbManager\TcbManager;
 

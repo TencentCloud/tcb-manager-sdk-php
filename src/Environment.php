@@ -3,6 +3,7 @@
 namespace TcbManager;
 
 
+use TcbManager\Api\EndpointType;
 use TcbManager\Api\RequestAble;
 use TcbManager\Exceptions\EnvException;
 use TencentCloudBase\TCB;
@@ -70,10 +71,17 @@ class Environment {
             throw new EnvException(EnvException::ENV_ID_NOT_EXISTS);
         }
 
+        $region = $tcbManager->getRegion();
+        $endpoint = TcbManager::getEndpoint(EndpointType::TCB_API);
+        $serviceUrl = $endpoint === ""
+            ? "https://$this->id.$region.tcb-api.tencentcloudapi.com/admin"
+            : $endpoint;
+
         $this->tcb = new TCB([
             "secretId" => $tcbManager->getApi()->getCredential()->getSecretId(),
             "secretKey" => $tcbManager->getApi()->getCredential()->getSecretKey(),
-            "env" => $id
+            "env" => $id,
+            "serviceUrl" => $serviceUrl
         ]);
 
         if (isset($result->EnvList) and count($result->EnvList) === 1) {

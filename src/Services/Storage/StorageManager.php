@@ -7,6 +7,7 @@ use Exception;
 use stdClass;
 use GuzzleHttp\Exception\GuzzleException;
 use TcbManager\Api\Endpoint;
+use TcbManager\Api\EndpointType;
 use TcbManager\Services\AbstractService;
 use TcbManager\TcbManager;
 use TcbManager\Utils;
@@ -55,12 +56,13 @@ class StorageManager extends AbstractService
 
     public function __construct(TcbManager $tcb, stdClass $instanceInfo)
     {
-        parent::__construct($tcb);
-
+        $this->endpoint = TcbManager::getEndpoint(EndpointType::COS);
         $this->region = $instanceInfo->Region;
         $this->bucket = $instanceInfo->Bucket;
         $this->cdnDomain = $instanceInfo->CdnDomain;
         $this->appId = $instanceInfo->AppId;
+
+        parent::__construct($tcb);
 
         $this->api = new TCCosClient(
             $this->region,

@@ -27,6 +27,7 @@ class FunctionManagerTest extends TestCase
     private $sourceAfterFilePath = __DIR__.DS."source".DS."after".DS;
 
     private $sourceFilePathForPHP = __DIR__.DS."source".DS."hello-tcb-php".DS;
+    // private $sourceFilePathForPHP = __DIR__.DS."callee".DS;
     private $sourceFilePathForPHPZipFile = __DIR__.DS."source".DS."hello-tcb-php.zip";
 
     protected function setUp(): void
@@ -207,6 +208,7 @@ class FunctionManagerTest extends TestCase
         ];
 
         $functionName = "function_create_by_zip_file";
+//        $functionName = "callee";
 
         $this->tryDeleteFunction($functionName);
 
@@ -215,8 +217,8 @@ class FunctionManagerTest extends TestCase
             [
                 "ZipFile" => FunctionManager::makeZipFile($code)
             ],
-            "index.main_handler",
-            "Php7"
+            "index.main",
+            "Nodejs8.9"
         );
         $this->assertHasRequestId($result);
 

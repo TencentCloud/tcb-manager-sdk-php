@@ -6,6 +6,7 @@ namespace TcbManager\Services\Database;
 
 use Exception;
 use TcbManager\Api\Endpoint;
+use TcbManager\Api\EndpointType;
 use TcbManager\Services\AbstractService;
 use TcbManager\TcbManager;
 use TcbManager\Utils;
@@ -33,7 +34,7 @@ class DatabaseManager extends AbstractService
     /**
      * @var string
      */
-    protected $region = "";
+    protected $region = "ap-shanghai";
 
     /**
      * @var string 实例Id
@@ -47,11 +48,11 @@ class DatabaseManager extends AbstractService
 
     public function __construct(TcbManager $tcb, \stdClass $instanceInfo)
     {
-        parent::__construct($tcb);
-
+        $this->endpoint = TcbManager::getEndpoint(EndpointType::FLEXDB);
         $this->instanceId = $instanceInfo->InstanceId;
         $this->region = $instanceInfo->Region;
         $this->status = $instanceInfo->Status;
+        parent::__construct($tcb);
     }
 
     /**
@@ -138,10 +139,25 @@ class DatabaseManager extends AbstractService
      */
     public function deleteCollection(string $collectionName)
     {
-        return $this->request("DeleteTable", [
-            "Tag" => $this->instanceId,
-            "TableName" => $collectionName
-        ]);
+        $existsResult = $this->checkCollectionExists($collectionName);
+        if ($existsResult->Exists) {
+            $result = $this->request("DeleteTable", [
+                "Tag" => $this->instanceId,
+                "TableName" => $collectionName
+            ]);
+            return Utils::fromArrayToObject([
+                "RequestId" => $result->RequestId,
+                "IsDeleted" => true,
+                "ExistsResult" => $existsResult
+            ]);
+        }
+        else {
+            return Utils::fromArrayToObject([
+                "RequestId" => $existsResult->RequestId,
+                "IsDeleted" => false,
+                "ExistsResult" => $existsResult
+            ]);
+        }
     }
 
     /**

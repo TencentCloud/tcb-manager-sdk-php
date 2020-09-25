@@ -24,6 +24,7 @@ class TestBase
         if (getenv("CI", true) == "true"
             && getenv("TRAVIS", true) == "true") {
             // CI 环境
+            echo "CI", PHP_EOL;
             self::$secretId = getenv(Constants::ENV_SECRETID, true);
             self::$secretKey = getenv(Constants::ENV_SECRETKEY, true);
             self::$secretToken = getenv(Constants::ENV_SESSIONTOKEN, true);
@@ -31,6 +32,7 @@ class TestBase
         }
         else {
             // 本地环境
+            echo "LC", PHP_EOL;
             self::$secretId = Config::$secretId;
             self::$secretKey = Config::$secretKey;
             self::$secretToken = Config::$secretToken;

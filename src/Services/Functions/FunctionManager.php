@@ -7,6 +7,7 @@ use Exception;
 use stdClass;
 
 use TcbManager\Api\Endpoint;
+use TcbManager\Api\EndpointType;
 use TcbManager\Services\AbstractService;
 use TcbManager\TcbManager;
 use TcbManager\Utils;
@@ -40,10 +41,10 @@ class FunctionManager extends AbstractService
 
     public function __construct(TcbManager $tcb, \stdClass $instanceInfo)
     {
-        parent::__construct($tcb);
-
+        $this->endpoint = TcbManager::getEndpoint(EndpointType::SCF);
         $this->namespace = $instanceInfo->Namespace;
         $this->region = $instanceInfo->Region;
+        parent::__construct($tcb);
     }
 
     public function getNamespace()
