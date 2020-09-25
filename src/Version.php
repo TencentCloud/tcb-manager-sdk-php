@@ -6,6 +6,6 @@ namespace TcbManager;
 
 class Version
 {
-    const VERSION = "TCB-MANAGER-PHP/1.2.2";
+    const VERSION = "TCB-MANAGER-PHP/2.0.0-beta.0";
 }
 
