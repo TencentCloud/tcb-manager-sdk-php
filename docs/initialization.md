@@ -8,7 +8,8 @@ $tcbManager = TcbManager::init([
     "secretId" => "Your SecretId",
     "secretKey" => "Your SecretKey",
     "secretToken" => "Your SecretToken", // 使用临时凭证需要此字段
-    "envId" => "Your envId"  // TCB环境ID，可在腾讯云TCB控制台获取
+    "envId" => "Your envId",  // TCB环境ID，可在腾讯云TCB控制台获取
+    "region" => "Your resource region" // 地域，可选，默认上海地域（ap-shanghai）
 ]);
 ```
 
@@ -112,6 +113,7 @@ stdClass Object
   * `$secretKey: string` - 腾讯云凭证 SecretKey，`$secretId` 与 `$secretKey` 必须同时传递
   * `$secretToken: string` - 【可选】腾讯云临时凭证 `token`，传递此字段时意味着使用的是临时凭证，如果显式传递临时凭证，则此参数必传
   * `$envId: string` - 【可选】环境Id，因为后续的很多接口依赖于环境，在未传递的情况下，需要通过 `addEnvironment()` 添加环境方可进行后续接口调用
+  * `$region: string` - 【可选】地域标识，请根据腾讯云云开发官网提供的支持的地域信息填写，如：上海地域 填写 `ap-shanghai`
 
 静态方法：
 
