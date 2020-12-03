@@ -86,9 +86,15 @@ class Environment {
 
         if (isset($result->EnvList) and count($result->EnvList) === 1) {
             $envInfo = $result->EnvList[0];
-            $this->functionManager = new FunctionManager($this->tcbManager, $envInfo->Functions[0]);
-            $this->databaseManager = new DatabaseManager($this->tcbManager, $envInfo->Databases[0]);
-            $this->storageManager = new StorageManager($this->tcbManager, $envInfo->Storages[0]);
+            if (isset($envInfo->Functions) && count($envInfo->Functions) >= 1) {
+                $this->functionManager = new FunctionManager($this->tcbManager, $envInfo->Functions[0]);
+            }
+            if (isset($envInfo->Databases) && count($envInfo->Databases) >= 1) {
+                $this->databaseManager = new DatabaseManager($this->tcbManager, $envInfo->Databases[0]);
+            }
+            if (isset($envInfo->Storages) && count($envInfo->Storages) >= 1) {
+                $this->storageManager = new StorageManager($this->tcbManager, $envInfo->Storages[0]);
+            }
         }
     }
 
