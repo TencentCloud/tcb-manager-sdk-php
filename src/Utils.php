@@ -74,7 +74,7 @@ class Utils
         $len = count($cs);
         $uri = '';
         for ($i = 1; $i <= $len; $i++) {
-            $uri .= $cs[$i] > 127 ? '%'.strtoupper(dechex($cs[$i])) : $url{$i-1};
+            $uri .= $cs[$i] > 127 ? '%'.strtoupper(dechex($cs[$i])) : $url[$i-1];
         }
         return $uri;
     }
