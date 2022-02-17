@@ -11,22 +11,22 @@
 
 ## 使用步骤
 
-### 安装SDK
+### 安装 SDK
 
 1. 【推荐】通过 `composer` 安装：
 
-    安装 `composer`，见：https://getcomposer.org/doc/00-intro.md
+   安装 `composer`，见：https://getcomposer.org/doc/00-intro.md
 
-    ```bash
-    composer require tencentcloudbase/tcb-manager-php:
-    ```
+   ```bash
+   composer require tencentcloudbase/tcb-manager-php:
+   ```
 
 2. 手动安装源码包：
 
-    1. 前往源码仓库下载源码包，仓库地址：https://github.com/TencentCloudBase/tcb-manager-php；
-    2. 将源码包放到项目合适位置；
+   1. 前往源码仓库下载源码包，仓库地址：https://github.com/TencentCloudBase/tcb-manager-php
+   2. 将源码包放到项目合适位置；
 
-### 引入SDK
+### 引入 SDK
 
 如果项目使用 `composer` 管理依赖，则会自动引入，可跳过此步骤
 
@@ -34,13 +34,13 @@
 require_once "/path/to/tcb-manager-php/autoload.php"
 ```
 
-### 使用SDK
+### 使用 SDK
 
 引用 SDK 后，便可以使用了，SDK 命名空间：`TcbManager`。
 
-### 初始化SDK
+### 初始化 SDK
 
-通过腾讯云API密钥初始化：
+通过腾讯云 API 密钥初始化：
 
 ```php
 $tcbManager = TcbManager::init([
@@ -51,9 +51,9 @@ $tcbManager = TcbManager::init([
 ]);
 ```
 
-> 注意：需要提前开通TCB服务并创建环境，否则SDK无法使用
+> 注意：需要提前开通 TCB 服务并创建环境，否则 SDK 无法使用
 
-腾讯云TCB控制台地址：https://console.cloud.tencent.com/tcb
+腾讯云 TCB 控制台地址：https://console.cloud.tencent.com/tcb
 
 在云函数环境下，支持免密钥初始化：
 
@@ -121,7 +121,7 @@ stdClass Object
                 (
                     [ModTime] => 2019-05-20 11:40:55
                     [Status] => Active
-                    [StatusDesc] => 
+                    [StatusDesc] =>
                     [FunctionName] => unit_test_3q4zyU
                     [Tags] => Array
                         (
@@ -143,8 +143,8 @@ stdClass Object
 
 ## Docs
 
-* [Overview](docs/overview.md)
-* [Initialization](docs/initialization.md)
-* [Cloud Function](docs/cloudfunction.md)
-* [Cloud Database](docs/clouddatabase.md)
-* [Cloud Storage](docs/cloudstorage.md)
+- [Overview](docs/overview.md)
+- [Initialization](docs/initialization.md)
+- [Cloud Function](docs/cloudfunction.md)
+- [Cloud Database](docs/clouddatabase.md)
+- [Cloud Storage](docs/cloudstorage.md)
